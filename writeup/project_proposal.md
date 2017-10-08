@@ -1,7 +1,7 @@
 ---
 title: "Psychology 251 Replication Project"
 author: "Dawn Finzi"
-output: word_document
+output: html_document
 ---
 
 
