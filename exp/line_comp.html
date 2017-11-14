@@ -324,7 +324,7 @@
   var probe_block = {
     type: 'single-stim',
     timing_response: 200,
-    stimulus: getPracticeProbe,
+    stimulus: getProbe,
     data: {trial_id: 'probe'},
     is_html: true,
     choices: 'none',
@@ -333,7 +333,7 @@
   var practice_probe_block = {
     type: 'single-stim',
     timing_response: 200,
-    stimulus: getProbe,
+    stimulus: getPracticeProbe,
     //data: {trial_id: 'probe'},
     is_html: true,
     choices: 'none',
