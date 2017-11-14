@@ -26,7 +26,7 @@
 # Other
 *.httr-oauth
 *.DS_Store
-*.json # Crucial that auth.json is never pushed to github!
+*.json 
 
 # Specific file keep
 !README.md
