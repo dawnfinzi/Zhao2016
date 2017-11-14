@@ -6,8 +6,8 @@
 *.history
 *.RData
 
-# Image/output files unless otherwise specified
-*.png
+# Image/output files unless otherwise specified 
+# (.png files not included because used in experiment)
 *.docx
 *.doc
 *.jpg
