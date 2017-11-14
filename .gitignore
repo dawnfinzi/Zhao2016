@@ -26,9 +26,11 @@
 # Other
 *.httr-oauth
 *.DS_Store
-*.json 
+
+# MTurk credentials and data
+auth.json
+mturk/
 
 # Specific file keep
 !README.md
 !/original_paper/Zhao2016.pdf
-!settings.json
