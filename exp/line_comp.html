@@ -29,7 +29,7 @@
 
   var getPracticeTarget = function() {
     var stim = ''
-    stim = shuffledStims_prac[curr_trial].target
+    stim = shuffledStims_prac[prac_trial].target
     return '<div class = imageBox><img class = image src = ' + stim + ' </img></div>'
   }
 
@@ -47,7 +47,7 @@
 
   var getPracticeProbe = function() {
     var stim = ''
-    stim = shuffledStims_prac[curr_trial].probe
+    stim = shuffledStims_prac[prac_trial].probe
     return '<div class = imageBox><img class = image src = ' + stim + ' </img></div>'
   }
 
@@ -55,6 +55,8 @@
   /* Define experimental variables */
   /* ************************************ */
   var curr_trial = 0
+  var prac_trial = 0
+
   var test_length = 30 //CHANGE TO 160
   var practice_length = 8 //CHANGE TO 8
 
@@ -64,7 +66,7 @@
   
   // set up practice images
   var practice_start = 20
-  var n_practice_base = 2
+  var n_practice_base = 4
   var practice_stims = []
   for (var i = 0; i < n_practice_base; i++) {
     for (var j = 0; j < 8; j++) {
@@ -382,6 +384,10 @@
     timing_post_trial: 1000,
     data: {
       rt: -1,
+    },
+
+    on_finish: function(data){      
+      prac_trial++
     },
   };
 
