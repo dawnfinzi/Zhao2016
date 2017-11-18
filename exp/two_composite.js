@@ -56,8 +56,8 @@
   /* ************************************ */
   var curr_trial_line = 0
   var prac_trial_line = 0
-  var test_length_line = 8 //CHANGE TO 160
-  var practice_length_line = 2 //CHANGE TO 8
+  var test_length_line = 160 //CHANGE TO 160
+  var practice_length_line = 8 //CHANGE TO 8
   var base_path_line = 'img/line_images/'
   var n_base_line = 20 
   
@@ -246,7 +246,7 @@
 
   // Set up experiment face images
   var curr_trial_face = 0
-  var test_length_face = 10 //CHANGE TO 160
+  var test_length_face = 160 //CHANGE TO 160
   var base_path_face = 'img/face_images/'
   var n_base_face = 10 
 
