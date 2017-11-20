@@ -267,8 +267,12 @@ div.tocify {
 </div>
 <div id="analysis-plan" class="section level3">
 <h3>Analysis Plan</h3>
-<p>Can also quote directly, though it is less often spelled out effectively for an analysis strategy section. The key is to report an analysis strategy that is as close to the original - data cleaning rules, data exclusion rules, covariates, etc. - as possible.</p>
-<p><strong>Clarify key analysis of interest here</strong> You can also pre-specify additional analyses you plan to do.</p>
+<ol style="list-style-type: decimal">
+<li>Exclude any subjects who scored less than 55% accuracy overall</li>
+<li>Calculate response sensitivity (d’) using hit rates and false alarms for all conditions separately (alignment x congruency x task)</li>
+<li>Run a 2 (alignment) x 2 (congruency) x 2 (task) repeated measures ANOVA</li>
+<li>Separate analyses for each task (line and face tasks). Run a 2 (alignment) x 2 (congruency) repeated measures ANOVA for each task and if there is a significant interaction, run post-hoc comparisons testing the effect of congruency in the aligned and misaligned conditions.</li>
+</ol>
 </div>
 <div id="differences-from-original-study" class="section level3">
 <h3>Differences from Original Study</h3>

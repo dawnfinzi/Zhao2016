@@ -50,9 +50,10 @@ The replication procedure is the same with two exceptions: 1) The order of the t
 
 ###Analysis Plan
 
-Can also quote directly, though it is less often spelled out effectively for an analysis strategy section.  The key is to report an analysis strategy that is as close to the original - data cleaning rules, data exclusion rules, covariates, etc. - as possible.  
-
-**Clarify key analysis of interest here**  You can also pre-specify additional analyses you plan to do.
+1. Exclude any subjects who scored less than 55% accuracy overall
+2. Calculate response sensitivity (d') using hit rates and false alarms for all conditions separately (alignment x congruency x task)
+3. Run a 2 (alignment) x 2 (congruency) x 2 (task) repeated measures ANOVA
+4. Run separate analyses for each task (line and face tasks). Run a 2 (alignment) x 2 (congruency) repeated measures ANOVA for each task and if there is a significant interaction, run post-hoc comparisons testing the effect of congruency in the aligned and misaligned conditions. 
 
 ###Differences from Original Study
 
