@@ -34,3 +34,4 @@ mturk/
 # Specific file keep
 !README.md
 !/original_paper/Zhao2016.pdf
+.Rproj.user
