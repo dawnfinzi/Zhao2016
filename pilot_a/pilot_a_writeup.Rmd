@@ -14,18 +14,18 @@ output:
 
 ##Introduction
 
-In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larher congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. We aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. 
-
+In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larher congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. We aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
 
 ##Methods
 
 ###Power Analysis
 
-Original effect size, power analysis for samples to achieve 80%, 90%, 95% power to detect that effect size.  Considerations of feasibility for selecting planned sample size.
+The effect we are attempting to replicate is the interaction between congruency and alignment in the line pattern task (ηp2 = .52). This original experiment had 22 participants, giving 99.9% a posteriori power with an alpha level of 0.05. A post-hoc power analysis given this effect size and alpha level determines that we would need 8 participants for 80% power, 8 participants for 90% power, and 10 participants for 95% power. Power calculations were run in G*power with the 'Options' changed so that the effect size specification was set 'as in SPSS'. 
 
 ###Planned Sample
 
-Planned sample size and/or termination rule, sampling frame, known demographics if any, preselection rules if any.
+Given the large effect size and relatively small original sample size, we planned to use the same sample size as the original authors (N = 22). However, for reasons of cost, we then reduced from original sample size of 22 to sample size of 15. 
+We plan to use an overall > 55% accuracy cutoff for excluding participants. 
 
 ###Materials
 
