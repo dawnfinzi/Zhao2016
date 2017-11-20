@@ -1,5 +1,5 @@
 ---
-title: "Replication of 'Beyond faces and expertise: Facelike holistic processing of nonface objects in the absence of expertise' by Zhao, Bülthoff and Bülthoff (2016, Psychological Science)"
+title: "Replication of 'Beyond faces and expertise' by Zhao, Bülthoff and Bülthoff (2016, Psychological Science)"
 author: "Dawn Finzi (dfinzi@stanford.edu)"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -29,11 +29,24 @@ We plan to use an overall > 55% accuracy cutoff for excluding participants.
 
 ###Materials
 
-All materials - can quote directly from original article - just put the text in quotations and note that this was followed precisely.  Or, quote directly and just point out exceptions to what was described in the original article.
+The materials in the original article were as follows: 
+
+> "Composite faces. Face stimuli were created from 20 Caucasian faces (10 males, 10 females; gray-scale images) in the face database of the Max Planck Institute for Biological Cybernetics (Blanz & Vetter, 1999; Troje & Bülthoff, 1996). Twenty face pairs were formed by using each face as a target face once and as a gender-matched paired face once. Each pair was a unique combination of two faces (i.e., any two pairs differed in at least one face). Each face image was cut into a top part and a bottom part (each 270 × 135 pixels). Within the pairs, tops and bottoms were combined to create composite faces (Fig. 1a). For each of the 20 pairs of faces, 8 pairs of composite faces were created following the design illustrated in Figure 1c. Thus, there were 160 pairs of composite faces in total. A 1-pixel black line was added to each composite face to clearly separate the top and bottom parts. Stimuli used for practice trials were created using the same method with additional faces from the database." 
+
+> "Composite patterns. Twenty pairs of line patterns were created; within each pair, one pattern served as the target (Fig. 1b). Each line-pattern stimulus was cut into a top part and a bottom part (each 270 × 135 pixels). Within each pair of line patterns, both the two top parts and the two bottom parts differed from each other, but they could be swapped without disrupting the Gestalt information connecting the top and bottom parts (i.e., connected- ness, closure, and continuity between lines). Aligning the top part of one line pattern with the bottom part of the paired line pattern formed a new line pattern, changing the appearance of the top part (i.e., emergent features were exhibited; Fig. 1b). The composite-pattern stimuli were created using the same method as for the faces. For each of the 20 pairs of line patterns, we created 8 pairs of composite patterns following the design illustrated in Figure 1c, so there were 160 pairs of test stimuli in total. Stimuli used for practice trials were created the same way with additional pairs of line patterns (see Fig. S1 in the Supplemental Material for all line-pattern stimuli)."
+
+For the replication we obtained the line patterns used from the authors, so those stimuli were identical to the original study. However, due to copyright issues, we were not able to obtain the original face stimuli. Instead, we used the face stimuli available from the [Rossion lab](face-categorization-lab.webnode.com/resources/) (Rossion, 2013). However, there were only enough stimuli for 10 pairs of face pairs, so each pair was repeated to create the original number of stimuli. 
+
 
 ###Procedure	
 
-Can quote directly from original article - just put the text in quotations and note that this was followed precisely.  Or, quote directly and just point out exceptions to what was described in the original article.
+The original procedure was as follows:  
+
+> "Participants performed two composite tasks, one with faces and one with line patterns (order counter- balanced across participants). On each trial, we presented 1 of the 160 pairs of faces or line patterns sequentially with an intervening mask (Figs. 1a and 1b). The target face or line pattern was always presented as the first stimulus. Participants made a same/different judgment about the top parts of the two faces or line patterns. Trials were presented in random order in each task, with an intertrial interval of 1 s (blank screen). Participants were instructed to attend to the top parts only and to ignore the bottom parts. For each task, participants completed eight practice trials before the experimental trials."
+
+> "We used a complete design of the composite task to measure holistic processing (Richler, Cheung, & Gauthier, 2011). With this design (Fig. 1c), the first stimulus in a trial (i.e., the target face or line pattern) was always aligned. The second was either aligned (aligned condition) or misaligned (misaligned condition). For misaligned faces and line patterns, we shifted the top part to the right and the bottom part to the left by 33 pixels each. The top parts of the two stimuli (i.e., targets) in a trial were either the same (same condition) or different from each other (different condition). Finally, the irrelevant bottom parts were also manipulated. In the congruent condition, the bottom parts were the same in the same condition and were different in the different condition. In the incongruent condition, they were different in the same condition and were the same in the different condition. This design yielded 160 trials per stimulus type (2 alignment conditions × 2 congruency conditions × 2 same/different conditions × 20 exemplars of target stimuli)."
+
+The replication procedure is the same with two exceptions: 1) The order of the tasks is not counterbalanced across participants. The line task is always presented first in order to avoid biasing participants towards using holistic processing techniques as they would with faces. 2) There are only practice trials for the line pattern task not the face task. This is because we have so few face stimuli in comparison to the original experiment. **Note: should I change this and add practice trials for Pilot B?**
 
 ###Analysis Plan
 
@@ -43,7 +56,11 @@ Can also quote directly, though it is less often spelled out effectively for an 
 
 ###Differences from Original Study
 
-Explicitly describe known differences in sample, setting, procedure, and analysis plan from original study.  The goal, of course, is to minimize those differences, but differences will inevitably occur.  Also, note whether such differences are anticipated to make a difference based on claims in the original article or subsequent published research on the conditions for obtaining the effect.
+* We are using a sample size of 15 instead of 22. This should still provide 99% power.
+* The face stimuli used are different. The stimuli we used instead have been shown to consistently yield face composite effects so this is not anticipated to make a difference. 
+* We do not have practice trials for the face composite task due to the lower number of available face stimuli.
+* We are not counterbalancing the tasks.
+* We are conducting the experiment on Mechanical Turk, not in the lab. Note, however, that the composite face effect has been consistently shown with these presentation times using samples from Mechanical Turk (Susilo, Rezlescu & Duchaine 2013).
 
 ### Methods Addendum (Post Data Collection)
 
@@ -141,8 +158,9 @@ d.line <- d.tidy %>%
   filter(trial_id == "line")
 
 d.results <- d.tidy %>%
-  group_by(trial_id,value) %>%
-  summarize(false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
+  group_by(worker_id,trial_id,value) %>%
+  summarize(avg = mean(correct),
+            false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
             hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
             d_prime = qnorm(hit_rate)-qnorm(false_alarm)) 
 
