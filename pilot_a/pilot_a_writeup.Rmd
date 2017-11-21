@@ -91,7 +91,6 @@ library(tidyverse)
 library(jsonlite)
 library(ez)
 library(lsr)
-library(multcomp)
 
 ####Import data
 path <- "/Users/dfinzi/Desktop/Zhao2016/exp/"
