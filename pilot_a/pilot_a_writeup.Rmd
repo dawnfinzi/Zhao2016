@@ -89,9 +89,9 @@ Data preparation following the analysis plan.
 rm(list=ls())
 library(tidyverse)
 library(jsonlite)
-##library(lsr)
 library(ez)
-##library(psyphy)
+library(lsr)
+library(multcomp)
 
 ####Import data
 path <- "/Users/dfinzi/Desktop/Zhao2016/exp/"
@@ -133,11 +133,11 @@ d <- d.raw[!row.has.na,] %>%
 d$rt <- as.numeric(d$rt)
 d$trial_index <- as.numeric(d$trial_index)
 d$trial_id <- as.factor(d$trial_id)
-d$alignment <- as.character(d$alignment)
+d$alignment <- as.factor(d$alignment)
 d$congruency <- as.character(d$congruency)
 d$response <- as.character(d$response)
 
-# view to make sure everything is norma;
+# view to make sure everything is normal
 head(d)
 d %>% ggplot(aes(x=rt)) +
   geom_histogram() +
@@ -155,15 +155,113 @@ d.tidy <- d %>%
 The analyses as specified in the analysis plan.  
 
 ```{r}
-d.line <- d.tidy %>%
-  filter(trial_id == "line")
-
-d.results <- d.tidy %>%
-  group_by(worker_id,trial_id,value) %>%
+## calculate hit rates, false alarms and d' by condition and task
+# account for potential hit rates of 1 or false alarm rates of 0
+d.results <- d %>%
+  group_by(worker_id,trial_id,alignment,congruency) %>%
   summarize(avg = mean(correct),
             false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
             hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
-            d_prime = qnorm(hit_rate)-qnorm(false_alarm)) 
+            max_fa = sum(response=="same"),
+            max_hr = sum(response=="different")) %>%
+  ungroup() %>%
+  mutate(false_alarm = ifelse(false_alarm == 0, 1/(2*max_fa), false_alarm)) %>%
+  mutate(hit_rate = ifelse(hit_rate == 1, 1-1/(2*max_hr), hit_rate)) %>%
+  group_by(worker_id,trial_id,alignment,congruency) %>%
+  mutate(d_prime = qnorm(hit_rate)-qnorm(false_alarm))
+
+## 2 (task) x 2 (congruency) x 2 (alignment) repeated measures ANOVA
+overall_anova <- ezANOVA(data = d.results,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(trial_id,congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+
+## individual 2 (congruency) x 2 (alignment) rm ANOVA for the line task
+d.line <- d.results %>%
+  filter(trial_id == "line")
+
+line_anova <- ezANOVA(data = d.line,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+
+# post hoc t tests
+num_tests_line = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
+
+# test effect of congruency in aligned condition
+# (Note to self: there has got to be a better way to do this!)
+d.line.aligned <- d.line %>%
+  filter(alignment == "aligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.line.aligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.line.aligned %>%
+  filter(congruency == "incongruent") 
+
+t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.line.aligned$p.value <- t.line.aligned$p.value/num_tests_line
+
+# test effect of congruency in misaligned condition
+d.line.misaligned <- d.line %>%
+  filter(alignment == "misaligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.line.misaligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.line.misaligned %>%
+  filter(congruency == "incongruent") 
+
+t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.line.misaligned$p.value <- t.line.misaligned$p.value/num_tests_line
+
+## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
+d.face <- d.results %>%
+  filter(trial_id == "face")
+
+face_anova <- ezANOVA(data = d.face,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+
+# post hoc t tests
+num_tests_face = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
+
+# test effect of congruency in aligned condition
+d.face.aligned <- d.face %>%
+  filter(alignment == "aligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.face.aligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.face.aligned %>%
+  filter(congruency == "incongruent") 
+
+t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.face.aligned$p.value <- t.face.aligned$p.value/num_tests_face
+
+# test effect of congruency in misaligned condition
+d.face.misaligned <- d.face %>%
+  filter(alignment == "misaligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.face.misaligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.face.misaligned %>%
+  filter(congruency == "incongruent") 
+
+t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.face.misaligned$p.value <- t.face.misaligned$p.value/num_tests_face
 
 ```
 
