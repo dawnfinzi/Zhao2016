@@ -133,20 +133,26 @@ d <- d.raw[!row.has.na,] %>%
 d$rt <- as.numeric(d$rt)
 d$trial_index <- as.numeric(d$trial_index)
 d$trial_id <- as.factor(d$trial_id)
-d$alignment <- as.factor(d$alignment)
+d$alignment <- as.character(d$alignment)
 d$congruency <- as.character(d$congruency)
 d$response <- as.character(d$response)
 
 # view to make sure everything is normal
 head(d)
+
 d %>% ggplot(aes(x=rt)) +
   geom_histogram() +
   ggthemes::theme_few()
+
+d %>%
+  group_by(worker_id) %>%
+  summarize (avg = mean(correct))
 
 #### Prepare data for analysis - create columns etc.
 
 d.tidy <- d %>%
   gather(condition, value, alignment, congruency)
+
 
 ```
 
@@ -177,6 +183,7 @@ overall_anova <- ezANOVA(data = d.results,
                    within = .(trial_id,congruency,alignment),
                    detailed = T,
                    return_aov = T)
+overall_anova$ANOVA
 
 ## individual 2 (congruency) x 2 (alignment) rm ANOVA for the line task
 d.line <- d.results %>%
@@ -188,6 +195,8 @@ line_anova <- ezANOVA(data = d.line,
                    within = .(congruency,alignment),
                    detailed = T,
                    return_aov = T)
+
+line_anova$ANOVA
 
 # post hoc t tests
 num_tests_line = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
@@ -206,6 +215,7 @@ x2 <- d.line.aligned %>%
 
 t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.line.aligned$p.value <- t.line.aligned$p.value/num_tests_line
+t.line.aligned
 
 # test effect of congruency in misaligned condition
 d.line.misaligned <- d.line %>%
@@ -220,6 +230,7 @@ x2 <- d.line.misaligned %>%
 
 t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.line.misaligned$p.value <- t.line.misaligned$p.value/num_tests_line
+t.line.misaligned
 
 ## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
 d.face <- d.results %>%
@@ -231,6 +242,8 @@ face_anova <- ezANOVA(data = d.face,
                    within = .(congruency,alignment),
                    detailed = T,
                    return_aov = T)
+
+face_anova$ANOVA
 
 # post hoc t tests
 num_tests_face = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
@@ -248,6 +261,7 @@ x2 <- d.face.aligned %>%
 
 t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.face.aligned$p.value <- t.face.aligned$p.value/num_tests_face
+t.face.aligned
 
 # test effect of congruency in misaligned condition
 d.face.misaligned <- d.face %>%
@@ -262,6 +276,7 @@ x2 <- d.face.misaligned %>%
 
 t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.face.misaligned$p.value <- t.face.misaligned$p.value/num_tests_face
+t.face.misaligned
 
 ```
 
