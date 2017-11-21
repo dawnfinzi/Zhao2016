@@ -213,7 +213,7 @@ x2 <- d.line.aligned %>%
   filter(congruency == "incongruent") 
 
 t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.line.aligned$p.value <- t.line.aligned$p.value/num_tests_line
+t.line.aligned$p.value <- t.line.aligned$p.value*num_tests_line
 t.line.aligned
 
 # test effect of congruency in misaligned condition
@@ -228,7 +228,7 @@ x2 <- d.line.misaligned %>%
   filter(congruency == "incongruent") 
 
 t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.line.misaligned$p.value <- t.line.misaligned$p.value/num_tests_line
+t.line.misaligned$p.value <- t.line.misaligned$p.value*num_tests_line
 t.line.misaligned
 
 ## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
@@ -259,7 +259,7 @@ x2 <- d.face.aligned %>%
   filter(congruency == "incongruent") 
 
 t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.face.aligned$p.value <- t.face.aligned$p.value/num_tests_face
+t.face.aligned$p.value <- t.face.aligned$p.value*num_tests_face
 t.face.aligned
 
 # test effect of congruency in misaligned condition
@@ -274,7 +274,7 @@ x2 <- d.face.misaligned %>%
   filter(congruency == "incongruent") 
 
 t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.face.misaligned$p.value <- t.face.misaligned$p.value/num_tests_face
+t.face.misaligned$p.value <- t.face.misaligned$p.value*num_tests_face
 t.face.misaligned
 
 ```
