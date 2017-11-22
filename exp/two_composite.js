@@ -56,8 +56,8 @@
   /* ************************************ */
   var curr_trial_line = 0
   var prac_trial_line = 0
-  var test_length_line = 160 //CHANGE TO 160
-  var practice_length_line = 8 //CHANGE TO 8
+  var test_length_line = 160 
+  var practice_length_line = 8 
   var base_path_line = 'img/line_images/'
   var n_base_line = 20 
   
@@ -246,7 +246,7 @@
 
   // Set up experiment face images
   var curr_trial_face = 0
-  var test_length_face = 160 //CHANGE TO 160
+  var test_length_face = 160 
   var base_path_face = 'img/face_images/'
   var n_base_face = 10 
 
@@ -398,6 +398,14 @@
     }
   };
 
+  // ask subjects if any problems completing the experiment
+  var problem_report = {
+    type: "survey-text",
+    questions: ['<p>Did you run into any issues while completing ' +
+                'this study?</p><p>(If yes, please describe)</p>'],
+    rows: [10]
+  }
+
   // Set up line task blocks
   /* define instructions block */
   var main_instructions_block_line = {
@@ -420,7 +428,9 @@
   /* define instructions block */
   var post_practice_block_line = {
     type: "text",
-    text: "<p>Great. Now we will continue to the main experiment." +
+    text: "<p>You have finished the practice. Now we will continue to the main experiment.</p>" +
+        "<p> Remember, if the top halves are the same press <strong>1</strong>. " +
+        "If they are different, press <strong>0</strong>.</p>" +
         "<p>Press any key to begin.</p>",
     timing_post_trial: 2000,
     data: {
@@ -622,6 +632,7 @@
     experiment.push(probe_block_face);
     experiment.push(response_block_face);
   }
+  experiment.push(problem_report); 
   experiment.push(debrief_block); 
   //add debrief block etc
   
