@@ -14,18 +14,18 @@ output:
 
 ##Introduction
 
-In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larher congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. We aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
+In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
 
 ##Methods
 
 ###Power Analysis
 
-The effect we are attempting to replicate is the interaction between congruency and alignment in the line pattern task (ηp2 = .52). This original experiment had 22 participants, giving 99.9% a posteriori power with an alpha level of 0.05. A post-hoc power analysis given this effect size and alpha level determines that we would need 8 participants for 80% power, 8 participants for 90% power, and 10 participants for 95% power. Power calculations were run in G*power with the 'Options' changed so that the effect size specification was set 'as in SPSS'. 
+The effect I am attempting to replicate is the interaction between congruency and alignment in the line pattern task. This was a 2 (congruency) x 2 (alignment) repeated measures ANOVA and the effect size of the interaction (ηp2) was 0.52. The original experiment had 22 participants, giving 99.9% a posteriori power with an alpha level of 0.05. A post-hoc power analysis given this effect size and alpha level determines that I would need 8 participants for 80% power, 8 participants for 90% power, and 10 participants for 95% power. Power calculations were run in G*power with the 'Options' changed so that the effect size specification was set 'as in SPSS'. 
 
 ###Planned Sample
 
-Given the large effect size and relatively small original sample size, we planned to use the same sample size as the original authors (N = 22). However, for reasons of cost, we then reduced from original sample size of 22 to sample size of 15. 
-We plan to use an overall > 55% accuracy cutoff for excluding participants. 
+Given the large effect size and relatively small original sample size, I planned to use the same sample size as the original authors (N = 22). However, for reasons of cost, I then reduced from original sample size of 22 to sample size of 15. 
+I plan to use an overall > 55% accuracy cutoff for excluding participants. 
 
 ###Materials
 
@@ -35,7 +35,7 @@ The materials in the original article were as follows:
 
 > "Composite patterns. Twenty pairs of line patterns were created; within each pair, one pattern served as the target (Fig. 1b). Each line-pattern stimulus was cut into a top part and a bottom part (each 270 × 135 pixels). Within each pair of line patterns, both the two top parts and the two bottom parts differed from each other, but they could be swapped without disrupting the Gestalt information connecting the top and bottom parts (i.e., connected- ness, closure, and continuity between lines). Aligning the top part of one line pattern with the bottom part of the paired line pattern formed a new line pattern, changing the appearance of the top part (i.e., emergent features were exhibited; Fig. 1b). The composite-pattern stimuli were created using the same method as for the faces. For each of the 20 pairs of line patterns, we created 8 pairs of composite patterns following the design illustrated in Figure 1c, so there were 160 pairs of test stimuli in total. Stimuli used for practice trials were created the same way with additional pairs of line patterns (see Fig. S1 in the Supplemental Material for all line-pattern stimuli)."
 
-For the replication we obtained the line patterns used from the authors, so those stimuli were identical to the original study. However, due to copyright issues, we were not able to obtain the original face stimuli. Instead, we used the face stimuli available from the [Rossion lab](face-categorization-lab.webnode.com/resources/) (Rossion, 2013). However, there were only enough stimuli for 10 pairs of face pairs, so each pair was repeated to create the original number of stimuli. 
+For the replication I obtained the line patterns used from the authors, so those stimuli were identical to the original study. However, due to copyright issues, I was not able to obtain the original face stimuli. Instead, I used the face stimuli available from the [Rossion lab](face-categorization-lab.webnode.com/resources/) (Rossion, 2013). However, there were only enough stimuli for 10 pairs of face pairs, so each pair was repeated to create the original number of stimuli. 
 
 
 ###Procedure	
@@ -59,11 +59,11 @@ The online experiment can be accessed [here](http://stanford.edu/~dfinzi/Zhao_et
 
 ###Differences from Original Study
 
-* We are using a sample size of 15 instead of 22. This should still provide 99% power.
-* The face stimuli used are different. The stimuli we used instead have been shown to consistently yield face composite effects so this is not anticipated to make a difference. 
-* We do not have practice trials for the face composite task due to the lower number of available face stimuli.
-* We are not counterbalancing the tasks.
-* We are conducting the experiment on Mechanical Turk, not in the lab. Note, however, that the composite face effect has been consistently shown with these presentation times using samples from Mechanical Turk (Susilo, Rezlescu & Duchaine 2013).
+* I am using a sample size of 15 instead of 22. This should still provide 99% power.
+* The face stimuli used are different. The stimuli I used instead have been shown to consistently yield face composite effects so this is not anticipated to make a difference. 
+* I do not have practice trials for the face composite task due to the lower number of available face stimuli.
+* I am not counterbalancing the tasks so as not to bias participants toward using holistic processing by presenting the face task first. 
+* I am conducting the experiment on Mechanical Turk, not in the lab. Note, however, that the composite face effect has been consistently shown with these presentation times using samples from Mechanical Turk (Susilo, Rezlescu & Duchaine 2013).
 
 ### Methods Addendum (Post Data Collection)
 
@@ -123,7 +123,7 @@ for (f in files) {
 length(unique(d.raw$worker_id))
 
 #### Data exclusion / filtering
-row.has.na <- apply(d.raw, 1, function(x){any(is.na(x))})
+row.has.na <- apply(d.raw, 1, function(x){any(is.na(x))}) # get rid of non response data
 d <- d.raw[!row.has.na,] %>%
   mutate(trial_id = ifelse(trial_id == "response_line","line", "face")) %>%
   mutate(correct = ifelse(correct == "TRUE", 1, 0)) %>%
@@ -215,7 +215,7 @@ x2 <- d.line.aligned %>%
   filter(congruency == "incongruent") 
 
 t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.line.aligned$p.value <- t.line.aligned$p.value*num_tests_line
+t.line.aligned$p.value <- t.line.aligned$p.value*num_tests_line # correct p value for mult comp
 t.line.aligned
 
 # test effect of congruency in misaligned condition
@@ -230,7 +230,7 @@ x2 <- d.line.misaligned %>%
   filter(congruency == "incongruent") 
 
 t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.line.misaligned$p.value <- t.line.misaligned$p.value*num_tests_line
+t.line.misaligned$p.value <- t.line.misaligned$p.value*num_tests_line # correct p value for mult comp
 t.line.misaligned
 
 ## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
@@ -261,7 +261,7 @@ x2 <- d.face.aligned %>%
   filter(congruency == "incongruent") 
 
 t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.face.aligned$p.value <- t.face.aligned$p.value*num_tests_face
+t.face.aligned$p.value <- t.face.aligned$p.value*num_tests_face # correct p value for mult comp
 t.face.aligned
 
 # test effect of congruency in misaligned condition
@@ -276,8 +276,41 @@ x2 <- d.face.misaligned %>%
   filter(congruency == "incongruent") 
 
 t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
-t.face.misaligned$p.value <- t.face.misaligned$p.value*num_tests_face
+t.face.misaligned$p.value <- t.face.misaligned$p.value*num_tests_face # correct p value for mult comp
 t.face.misaligned
+
+## Reproduce original graph
+# use data frame structure of d.results
+orig <- d.results[1:8,]
+orig <- orig %>%
+  ungroup() %>%
+  select(trial_id,alignment,congruency,d_prime)
+# replace d prime values with values from paper - exact values were not reported and had to be approximated from the original figure
+orig$d_prime <- c(2.6,1.9,2.3,2,2.7,1.5,2,1.9)
+# plot face and line data
+orig %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_grid(.~ trial_id) +
+  geom_point(aes(col=congruency))+
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_classic() +
+  theme(legend.position = "top") 
+
+## Plot the replication data in the same format
+d.plot <- d.results %>%
+  ungroup() %>%
+  group_by(trial_id,alignment,congruency) %>%
+  summarize(avg = mean(d_prime))
+d.plot %>%
+  ggplot(aes(x= alignment, y = avg)) +
+  facet_grid(.~ trial_id) +
+  geom_point(aes(col=congruency))+
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_classic() +
+  theme(legend.position = "top") 
+
 
 ```
 
