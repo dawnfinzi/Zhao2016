@@ -103,7 +103,9 @@ p {
 
 input[type="text"] {
   font-family: 'Open Sans', 'Arial', sans-sefif;
-  font-size: 14px;
+  font-size: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* borrowing Bootstrap style for btn elements, but combining styles a bit */
@@ -371,4 +373,30 @@ label.jspsych-survey-multi-choice-text input[type="radio"] {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Additions to the default css 
+*/
+.instructions {
+  text-align: center;
+}
+
+.legal {
+  margin: 0 auto;
+  margin-top: 6.5em;
+  font-size: 0.8em;
+}
+
+.task-instructions {
+  margin-top: 3.5em;
+  text-align: center;
+  font-size: 30px;
+}
+  
+
+.block-text {
+  width: 800px;
+  text-align: justify;
+  margin: 0 auto;
+  margin-bottom: 1em;
 }
