@@ -69,7 +69,7 @@
   var feedback_index = 0
   var curr_trial_line = 0
   var prac_trial_line = 0
-  var test_length_line = 5 //160 
+  var test_length_line = 160 
   var practice_length_line = 8 
   var base_path_line = 'img/line_images/'
   var n_base_line = 20 
@@ -260,7 +260,7 @@
   // Set up experiment face images
   var curr_trial_face = 0
   var prac_trial_face = 0
-  var test_length_face = 5 //160 
+  var test_length_face = 160 
   var practice_length_face = 4
   var base_path_face = 'img/face_images/'
   var n_base_face = 10 
