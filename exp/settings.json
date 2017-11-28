@@ -1,14 +1,14 @@
 {
     "title":               "Composite task",
-    "description":         "Composite line task replication",
+    "description":         "Composite task replication",
     "keywords":            "psychology, behavioral, study, experiment",
     "url":                 "https://web.stanford.edu/~dfinzi/Zhao_et_al_2016_replication/preview.html",
     "frame_height":         450,
     "assignment_duration":  "1 hour",
-    "auto_approval_delay":  "2 days",
-    "reward":               1.5,
+    "auto_approval_delay":  "1 day",
+    "reward":               3.63,
     "qualifications": {
         "location": "US",
-        "approval_percentage": 85
+        "approval_percentage": 95
     }
 }
