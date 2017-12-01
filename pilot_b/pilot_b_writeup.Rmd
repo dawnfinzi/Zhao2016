@@ -1,0 +1,326 @@
+---
+title: "Replication of 'Beyond faces and expertise' by Zhao, Bülthoff and Bülthoff (2016, Psychological Science)"
+author: "Dawn Finzi (dfinzi@stanford.edu)"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: false
+---
+
+<!-- Replication reports should all use this template to standardize reporting across projects.  These reports will be public supplementary materials that accompany the summary report(s) of the aggregate results. -->
+
+##Introduction
+
+In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
+
+##Methods
+
+###Power Analysis
+
+The effect I am attempting to replicate is the interaction between congruency and alignment in the line pattern task. This was a 2 (congruency) x 2 (alignment) repeated measures ANOVA and the effect size of the interaction (ηp2) was 0.52. The original experiment had 22 participants, giving 99.9% a posteriori power with an alpha level of 0.05. A post-hoc power analysis given this effect size and alpha level determines that I would need 8 participants for 80% power, 8 participants for 90% power, and 10 participants for 95% power. Power calculations were run in G*power with the 'Options' changed so that the effect size specification was set 'as in SPSS'. 
+
+###Planned Sample
+
+Given the large effect size and relatively small original sample size, I planned to use the same sample size as the original authors (N = 22). However, for reasons of cost, I then reduced from original sample size of 22 to sample size of 15. 
+I plan to use an overall > 55% accuracy cutoff for excluding participants. 
+
+###Materials
+
+The materials in the original article were as follows: 
+
+> "Composite faces. Face stimuli were created from 20 Caucasian faces (10 males, 10 females; gray-scale images) in the face database of the Max Planck Institute for Biological Cybernetics (Blanz & Vetter, 1999; Troje & Bülthoff, 1996). Twenty face pairs were formed by using each face as a target face once and as a gender-matched paired face once. Each pair was a unique combination of two faces (i.e., any two pairs differed in at least one face). Each face image was cut into a top part and a bottom part (each 270 × 135 pixels). Within the pairs, tops and bottoms were combined to create composite faces (Fig. 1a). For each of the 20 pairs of faces, 8 pairs of composite faces were created following the design illustrated in Figure 1c. Thus, there were 160 pairs of composite faces in total. A 1-pixel black line was added to each composite face to clearly separate the top and bottom parts. Stimuli used for practice trials were created using the same method with additional faces from the database." 
+
+> "Composite patterns. Twenty pairs of line patterns were created; within each pair, one pattern served as the target (Fig. 1b). Each line-pattern stimulus was cut into a top part and a bottom part (each 270 × 135 pixels). Within each pair of line patterns, both the two top parts and the two bottom parts differed from each other, but they could be swapped without disrupting the Gestalt information connecting the top and bottom parts (i.e., connected- ness, closure, and continuity between lines). Aligning the top part of one line pattern with the bottom part of the paired line pattern formed a new line pattern, changing the appearance of the top part (i.e., emergent features were exhibited; Fig. 1b). The composite-pattern stimuli were created using the same method as for the faces. For each of the 20 pairs of line patterns, we created 8 pairs of composite patterns following the design illustrated in Figure 1c, so there were 160 pairs of test stimuli in total. Stimuli used for practice trials were created the same way with additional pairs of line patterns (see Fig. S1 in the Supplemental Material for all line-pattern stimuli)."
+
+For the replication I obtained the line patterns used from the authors, so those stimuli were identical to the original study. However, due to copyright issues, I was not able to obtain the original face stimuli. Instead, I used the face stimuli available from the [Rossion lab](face-categorization-lab.webnode.com/resources/) (Rossion, 2013). However, there were only enough stimuli for 10 pairs of face pairs, so each pair was repeated to create the original number of stimuli. 
+
+
+###Procedure	
+
+The original procedure was as follows:  
+
+> "Participants performed two composite tasks, one with faces and one with line patterns (order counter- balanced across participants). On each trial, we presented 1 of the 160 pairs of faces or line patterns sequentially with an intervening mask (Figs. 1a and 1b). The target face or line pattern was always presented as the first stimulus. Participants made a same/different judgment about the top parts of the two faces or line patterns. Trials were presented in random order in each task, with an intertrial interval of 1 s (blank screen). Participants were instructed to attend to the top parts only and to ignore the bottom parts. For each task, participants completed eight practice trials before the experimental trials."
+
+> "We used a complete design of the composite task to measure holistic processing (Richler, Cheung, & Gauthier, 2011). With this design (Fig. 1c), the first stimulus in a trial (i.e., the target face or line pattern) was always aligned. The second was either aligned (aligned condition) or misaligned (misaligned condition). For misaligned faces and line patterns, we shifted the top part to the right and the bottom part to the left by 33 pixels each. The top parts of the two stimuli (i.e., targets) in a trial were either the same (same condition) or different from each other (different condition). Finally, the irrelevant bottom parts were also manipulated. In the congruent condition, the bottom parts were the same in the same condition and were different in the different condition. In the incongruent condition, they were different in the same condition and were the same in the different condition. This design yielded 160 trials per stimulus type (2 alignment conditions × 2 congruency conditions × 2 same/different conditions × 20 exemplars of target stimuli)."
+
+The replication procedure is the same with two exceptions: 1) The order of the tasks is not counterbalanced across participants. The line task is always presented first in order to avoid biasing participants towards using holistic processing techniques as they would with faces. 2) There are only practice trials for the line pattern task not the face task. This is because we have so few face stimuli in comparison to the original experiment. **Note: should I change this and add practice trials for Pilot B?**
+
+The online experiment can be accessed [here](http://stanford.edu/~dfinzi/Zhao_et_al_2016_replication/experiment.html).
+
+###Analysis Plan
+
+1. Exclude any subjects who scored less than 55% accuracy overall
+2. Calculate response sensitivity (d') using hit rates and false alarms for all conditions separately (alignment x congruency x task)
+3. Run a 2 (alignment) x 2 (congruency) x 2 (task) repeated measures ANOVA
+4. Run separate analyses for each task (line and face tasks). Run a 2 (alignment) x 2 (congruency) repeated measures ANOVA for each task and if there is a significant interaction, run post-hoc comparisons testing the effect of congruency in the aligned and misaligned conditions. 
+
+###Differences from Original Study
+
+* I am using a sample size of 15 instead of 22. This should still provide 99% power.
+* The face stimuli used are different. The stimuli I used instead have been shown to consistently yield face composite effects so this is not anticipated to make a difference. 
+* I have 4 instead of 8 practice trials for the face composite task due to the lower number of available face stimuli.
+* I am not counterbalancing the tasks so as not to bias participants toward using holistic processing by presenting the face task first. 
+* I am conducting the experiment on Mechanical Turk, not in the lab. Note, however, that the composite face effect has been consistently shown with these presentation times using samples from Mechanical Turk (Susilo, Rezlescu & Duchaine 2013).
+
+### Methods Addendum (Post Data Collection)
+
+You can comment this section out prior to final report with data collection.
+
+#### Actual Sample
+  Sample size, demographics, data exclusions based on rules spelled out in analysis plan
+
+#### Differences from pre-data collection methods plan
+  Any differences from what was described as the original plan, or “none”.
+
+
+##Results
+
+
+### Data preparation
+
+Data preparation following the analysis plan.
+	
+```{r include=T}
+###Data Preparation
+
+####Load Relevant Libraries and Functions
+
+rm(list=ls())
+library(tidyverse)
+library(jsonlite)
+library(ez)
+library(lsr)
+
+####Import data
+path <- "/Users/dfinzi/Desktop/Zhao2016/pilot_b/"
+files <- dir(paste0(path,"production-results/"), 
+             pattern = "*.json")
+d.raw <- data.frame()
+
+for (f in files) {
+  jf <- paste0(path, "production-results/",f)
+  jd <- jsonlite::fromJSON(paste(readLines(jf)), flatten=TRUE)
+  
+  worker_id <- jd$WorkerId
+  trial_id <- jd$answers$data$trial_id
+  trial_index <- jd$answer$data$trial_index
+  correct <- jd$answer$data$correct
+  alignment <- jd$answer$data$alignment
+  congruency <- jd$answer$data$congruency
+  response <- jd$answer$data$response
+  rt <- jd$answer$data$rt
+  
+  id <- cbind(trial_id,trial_index,correct,alignment,congruency,response,rt)
+  sub_data <- data.frame(id, worker_id)
+  
+  d.raw <- rbind(d.raw,sub_data)
+}
+
+# Number of participants
+length(unique(d.raw$worker_id))
+
+#### Data exclusion / filtering
+row.has.na <- apply(d.raw, 1, function(x){any(is.na(x))}) # get rid of non response data
+d <- d.raw[!row.has.na,] %>%
+  mutate(trial_id = ifelse(trial_id == "response_line","line", "face")) %>%
+  mutate(correct = ifelse(correct == "TRUE", 1, 0)) %>%
+  mutate(answer = ifelse((response=="same"&correct==1)|
+                           (response=="different"&correct==0),"same","different")) 
+
+# recast variables (imported as lists)
+d$rt <- as.numeric(d$rt)
+d$trial_index <- as.numeric(d$trial_index)
+d$trial_id <- as.factor(d$trial_id)
+d$alignment <- as.character(d$alignment)
+d$congruency <- as.character(d$congruency)
+d$response <- as.character(d$response)
+
+# view to make sure everything is normal
+head(d)
+
+d %>% ggplot(aes(x=rt)) +
+  geom_histogram() +
+  ggthemes::theme_few()
+
+d %>%
+  group_by(worker_id) %>%
+  summarize (avg = mean(correct))
+
+#### Prepare data for analysis - create columns etc.
+
+d.tidy <- d %>%
+  gather(condition, value, alignment, congruency)
+
+
+```
+
+### Confirmatory analysis
+
+The analyses as specified in the analysis plan.  
+
+```{r}
+## calculate hit rates, false alarms and d' by condition and task
+# account for potential hit rates of 1 or false alarm rates of 0
+d.results <- d %>%
+  group_by(worker_id,trial_id,alignment,congruency) %>%
+  summarize(avg = mean(correct),
+            false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
+            hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
+            max_fa = sum(response=="same"),
+            max_hr = sum(response=="different")) %>%
+  ungroup() %>%
+  mutate(false_alarm = ifelse(false_alarm == 0, 1/(2*max_fa), false_alarm)) %>%
+  mutate(hit_rate = ifelse(hit_rate == 1, 1-1/(2*max_hr), hit_rate)) %>%
+  group_by(worker_id,trial_id,alignment,congruency) %>%
+  mutate(d_prime = qnorm(hit_rate)-qnorm(false_alarm))
+
+## 2 (task) x 2 (congruency) x 2 (alignment) repeated measures ANOVA
+overall_anova <- ezANOVA(data = d.results,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(trial_id,congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+overall_anova$ANOVA
+
+## individual 2 (congruency) x 2 (alignment) rm ANOVA for the line task
+d.line <- d.results %>%
+  filter(trial_id == "line")
+
+line_anova <- ezANOVA(data = d.line,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+
+line_anova$ANOVA
+
+# post hoc t tests
+num_tests_line = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
+
+# test effect of congruency in aligned condition
+# (Note to self: there has got to be a better way to do this!)
+d.line.aligned <- d.line %>%
+  filter(alignment == "aligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.line.aligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.line.aligned %>%
+  filter(congruency == "incongruent") 
+
+t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.line.aligned$p.value <- t.line.aligned$p.value*num_tests_line # correct p value for mult comp
+t.line.aligned
+
+# test effect of congruency in misaligned condition
+d.line.misaligned <- d.line %>%
+  filter(alignment == "misaligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.line.misaligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.line.misaligned %>%
+  filter(congruency == "incongruent") 
+
+t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.line.misaligned$p.value <- t.line.misaligned$p.value*num_tests_line # correct p value for mult comp
+t.line.misaligned
+
+## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
+d.face <- d.results %>%
+  filter(trial_id == "face")
+
+face_anova <- ezANOVA(data = d.face,
+                   dv = d_prime,
+                   wid = worker_id,
+                   within = .(congruency,alignment),
+                   detailed = T,
+                   return_aov = T)
+
+face_anova$ANOVA
+
+# post hoc t tests
+num_tests_face = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
+
+# test effect of congruency in aligned condition
+d.face.aligned <- d.face %>%
+  filter(alignment == "aligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.face.aligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.face.aligned %>%
+  filter(congruency == "incongruent") 
+
+t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.face.aligned$p.value <- t.face.aligned$p.value*num_tests_face # correct p value for mult comp
+t.face.aligned
+
+# test effect of congruency in misaligned condition
+d.face.misaligned <- d.face %>%
+  filter(alignment == "misaligned") %>%
+  dplyr::select(worker_id, congruency, d_prime)
+
+x1 <- d.face.misaligned %>%
+  filter(congruency == "congruent") 
+
+x2 <- d.face.misaligned %>%
+  filter(congruency == "incongruent") 
+
+t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
+t.face.misaligned$p.value <- t.face.misaligned$p.value*num_tests_face # correct p value for mult comp
+t.face.misaligned
+
+## Reproduce original graph
+# use data frame structure of d.results
+orig <- d.results[1:8,]
+orig <- orig %>%
+  ungroup() %>%
+  select(trial_id,alignment,congruency,d_prime)
+# replace d prime values with values from paper - exact values were not reported and had to be approximated from the original figure
+orig$d_prime <- c(2.6,1.9,2.3,2,2.7,1.5,2,1.9)
+# plot face and line data
+orig %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_grid(.~ trial_id) +
+  geom_point(aes(col=congruency))+
+  ylim(0,5) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_classic() +
+  theme(legend.position = "top") 
+
+## Plot the replication data in the same format
+d.plot <- d.results %>%
+  ungroup() %>%
+  group_by(trial_id,alignment,congruency) %>%
+  summarize(avg = mean(d_prime))
+d.plot %>%
+  ggplot(aes(x= alignment, y = avg)) +
+  facet_grid(.~ trial_id) +
+  geom_point(aes(col=congruency))+
+  ylim(0,5) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_classic() +
+  theme(legend.position = "top") 
+
+
+```
+
+![Key plot from original paper.](/Users/dfinzi/Desktop/Zhao2016/pilot_a/original_figure.png)
+*Side-by-side graph with original graph is ideal here*
+
+###Exploratory analyses
+
+## Discussion
+
+### Summary of Replication Attempt
+
+### Commentary
