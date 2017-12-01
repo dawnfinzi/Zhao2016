@@ -120,7 +120,7 @@ for (f in files) {
 }
 
 # Number of participants
-length(unique(d.raw$worker_id))
+total_n <- length(unique(d.raw$worker_id))
 
 #### Data exclusion / filtering
 row.has.na <- apply(d.raw, 1, function(x){any(is.na(x))}) # get rid of non response data
@@ -129,6 +129,16 @@ d <- d.raw[!row.has.na,] %>%
   mutate(correct = ifelse(correct == "TRUE", 1, 0)) %>%
   mutate(answer = ifelse((response=="same"&correct==1)|
                            (response=="different"&correct==0),"same","different")) 
+
+# Exclude subjects with less than 55% accuracy overall
+d <- d %>%
+  group_by(worker_id) %>%
+  mutate(avg = mean(correct)) %>%
+  filter(avg > .55)
+
+# Sanity check - number of participants again
+filtered_n <- length(unique(d$worker_id))
+num_excluded <- total_n - filtered_n
 
 # recast variables (imported as lists)
 d$rt <- as.numeric(d$rt)
@@ -144,10 +154,6 @@ head(d)
 d %>% ggplot(aes(x=rt)) +
   geom_histogram() +
   ggthemes::theme_few()
-
-d %>%
-  group_by(worker_id) %>%
-  summarize (avg = mean(correct))
 
 #### Prepare data for analysis - create columns etc.
 
