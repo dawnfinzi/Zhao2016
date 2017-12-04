@@ -541,14 +541,14 @@
   /* define instructions block */
   var main_instructions_block_line = {
     type: "text",
-    text: "<p class='legal'; style = font-size:20px>This experiment has two parts. In the first part of the " +
-        "experiment, a line pattern will appear in the center " +
+    text: "<p class='legal'; style = font-size:20px>This experiment has two parts. Each part will take about 15 minutes. " +
+        "In the first part of the experiment, a line pattern will appear in the center " +
         "of the screen. Then you will quickly see a jumbled image, " +
         "followed by another line pattern. Finally, a prompt will appear " +
         "asking 'same or different'</p><p style = font-size:20px>If the <strong>top</strong> half of " +
         "the line pattern was the same as the first line pattern you saw press " +
         "<strong>1</strong>.</p><p style = font-size:20px> If it's different, press <strong>0</strong>" +
-        "<p style = font-size:20px>We will start with a few practice trials and then go on to the main experiment." +
+        "<p style = font-size:20px>We will start with eight practice trials and then go on to the main experiment." +
         " Press Enter to begin.</p>",
     cont_key: [13],
     timing_post_trial: 2000,
@@ -561,7 +561,8 @@
   /* define instructions block */
   var post_practice_block_line = {
     type: "text",
-    text: "<p class='legal'; style = font-size:25px>You have finished the practice. Now we will continue to the main experiment.</p>" +
+    text: "<p class='legal'; style = font-size:25px>You have finished the practice. Now we will continue to the first main task. " +
+        " This should take about 15 minutes to complete. </p>" +
         "<p style = font-size:25px> Remember, if the top halves are the same press <strong>1</strong>. " +
         "If they are different, press <strong>0</strong>.</p>" +
         "<p style = font-size:25px>Press Enter to begin.</p>",
@@ -585,7 +586,7 @@
 
   var practice_target_block_line = {
     type: 'single-stim',
-    timing_response: 200,
+    timing_response: 400,
     stimulus: getPracticeTarget_line,
     //data: {
     //  trial_id: 'target',
@@ -609,7 +610,7 @@
 
   var practice_probe_block_line = {
     type: 'single-stim',
-    timing_response: 200,
+    timing_response: 400,
     stimulus: getPracticeProbe_line,
     //data: {trial_id: 'probe'},
     is_html: true,
@@ -688,7 +689,8 @@
   /* define instructions block */
   var main_instructions_block_face = {
     type: "text",
-    text: "<p class='legal'; style = font-size:20px>Now we will continue to the second part " +
+    text: "<p class='legal'; style = font-size:20px>Great, you are now halfway done! Feel free to take a quick break before continuing. " +
+        "When you are ready, we will continue to the second part " +
         "of the experiment</p><p style = font-size:20px>This will be the same as the " +
         "task you just completed, except that you will " +
         "see faces instead of line patterns.</p><p style = font-size:20px>A face will appear in the center " +
@@ -697,7 +699,7 @@
         "asking 'same or different'</p><p style = font-size:20px>If the <strong>top</strong> half of " +
         "the face was the same as the first face you saw press " +
         "<strong>1</strong>.</p><p style = font-size:20px> If it's different, press <strong>0</strong>. " +
-        "Press any Enter to start with a few quick practice trials.</p>",
+        "Press any Enter to start with four practice trials.</p>",
     cont_key: [13],
     timing_post_trial: 2000,
     data: {
@@ -708,7 +710,8 @@
 
   var post_practice_block_face = {
     type: "text",
-    text: "<p class='legal'; style = font-size:25px>You have finished the practice. Now we will continue to the main experiment.</p>" +
+    text: "<p class='legal'; style = font-size:25px>You have finished the practice. When you are ready, we will " +
+        " continue with the second main task. This should take about 15 minutes to complete. </p>" +
         "<p style = font-size:25px> Remember, if the top halves are the same press <strong>1</strong>. " +
         "If they are different, press <strong>0</strong>.</p>" +
         "<p style = font-size:25px>Press Enter to begin.</p>",
@@ -732,7 +735,7 @@
 
   var practice_target_block_face = {
     type: 'single-stim',
-    timing_response: 200,
+    timing_response: 400,
     stimulus: getPracticeTarget_face,
     //data: {
     //  trial_id: 'target',
@@ -756,7 +759,7 @@
 
   var practice_probe_block_face = {
     type: 'single-stim',
-    timing_response: 200,
+    timing_response: 400,
     stimulus: getPracticeProbe_face,
     //data: {trial_id: 'probe'},
     is_html: true,
