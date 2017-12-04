@@ -337,7 +337,7 @@ orig %>%
   geom_point(aes(col=congruency)) +
   geom_line(aes(group = congruency,col=congruency)) +
   labs(title = "Original plot") +
-  ylim(0,5) + ylab("Sensitivity (d')") + xlab("") +
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
   scale_color_manual(values=c("red", "blue")) +
   theme_classic() +
   theme(legend.position = "top") +
