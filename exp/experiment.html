@@ -20,7 +20,7 @@
 $( document ).ready(function() {
     jsPsych.init({
 	timeline: experiment,
-	show_progress_bar: true,
+	//show_progress_bar: true,
 	fullscreen: true,
 	on_finish: function() {
 	  opener.turk.submit(jsPsych.data.getData())

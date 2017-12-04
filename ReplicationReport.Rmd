@@ -14,7 +14,8 @@ output:
 
 ##Introduction
 
-In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks, where the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
+In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks. In a composite task, participants are shown two images (separated by a mask). Participants are then asked whether the top half of the second image is the same as, or different from, the first image they were shown. The effect produced by holistic processing is an increased difficulty in identifying as the same top halves of two sequentially presented stimuli when aligned with different bottom halves, than when misaligned with said bottom halves. This effect has traditionally been shown with faces. 
+Here, the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
 
 ##Methods
 
@@ -83,7 +84,7 @@ You can comment this section out prior to final report with data collection.
 
 Data preparation following the analysis plan.
 	
-```{r include=T}
+```{r include=F, message=FALSE}
 ###Data Preparation
 
 ####Load Relevant Libraries and Functions
@@ -91,17 +92,23 @@ Data preparation following the analysis plan.
 rm(list=ls())
 library(tidyverse)
 library(jsonlite)
+library(knitr)
+library(kableExtra)
 library(ez)
 library(lsr)
 
+options(knitr.table.format = "html") 
+```
+
+```{r, message=FALSE}
 ####Import data
-path <- "../Zhao2016/pilot_b/"
-files <- dir(paste0(path,"production-results/"), 
+path <- "../Zhao2016/"
+files <- dir(paste0(path,"anonymized-results/"), 
              pattern = "*.json")
 d.raw <- data.frame()
 
 for (f in files) {
-  jf <- paste0(path, "production-results/",f)
+  jf <- paste0(path, "anonymized-results/",f)
   jd <- jsonlite::fromJSON(paste(readLines(jf)), flatten=TRUE)
   
   worker_id <- jd$WorkerId
@@ -119,9 +126,6 @@ for (f in files) {
   d.raw <- rbind(d.raw,sub_data)
 }
 
-# Number of participants
-total_n <- length(unique(d.raw$worker_id))
-
 #### Data exclusion / filtering
 row.has.na <- apply(d.raw, 1, function(x){any(is.na(x))}) # get rid of non response data
 d <- d.raw[!row.has.na,] %>%
@@ -136,9 +140,15 @@ d <- d %>%
   mutate(avg = mean(correct)) %>%
   filter(avg > .55)
 
-# Sanity check - number of participants again
+# Compile sample size and exclusion values and print
+total_n <- length(unique(d.raw$worker_id))
 filtered_n <- length(unique(d$worker_id))
 num_excluded <- total_n - filtered_n
+basics <- data.frame(c(total_n, num_excluded, filtered_n))
+rownames(basics) <- c("Total participants", "Excluded participants", "Final sample")
+colnames(basics) <- "N"
+kable(basics) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F)
 
 # recast variables (imported as lists)
 d$rt <- as.numeric(d$rt)
@@ -149,26 +159,18 @@ d$congruency <- as.character(d$congruency)
 d$response <- as.character(d$response)
 
 # view to make sure everything is normal
-head(d)
+kable(head(d))
 
 d %>% ggplot(aes(x=rt)) +
-  geom_histogram() +
-  ggthemes::theme_few()
-
-#### Prepare data for analysis - create columns etc.
-
-d.tidy <- d %>%
-  gather(condition, value, alignment, congruency)
-
-
+  geom_histogram(binwidth=10, col = "black") +
+  labs(title = "Histogram of reaction time (all subjects collapsed)",
+       x = "Reaction time", y = "Count") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
-### Confirmatory analysis
 
-The analyses as specified in the analysis plan.  
-
+In order to run statistic analyses on the data, I am first calculating the hit rates and false alarms by condition and task. Then I will calculate d prime by subtracting the z-transform of the false alarm rate from the z-transform of the hit rate. To avoid impossible numbers, any false alarm rates of 0 will be replaced by 1/(2 x the max number of false alarms) and any hit rates of 1 will be replaced by 1-1/(2 x the max number of hits).
 ```{r}
-## calculate hit rates, false alarms and d' by condition and task
-# account for potential hit rates of 1 or false alarm rates of 0
+#### Prepare data for analysis 
 d.results <- d %>%
   group_by(worker_id,trial_id,alignment,congruency) %>%
   summarize(avg = mean(correct),
@@ -181,17 +183,27 @@ d.results <- d %>%
   mutate(hit_rate = ifelse(hit_rate == 1, 1-1/(2*max_hr), hit_rate)) %>%
   group_by(worker_id,trial_id,alignment,congruency) %>%
   mutate(d_prime = qnorm(hit_rate)-qnorm(false_alarm))
+```
+### Confirmatory analysis
 
-## 2 (task) x 2 (congruency) x 2 (alignment) repeated measures ANOVA
+#### Both tasks combined
+First, I want to see if there is an overall effect of congruency, and an interaction between congruency and alignment as in the Zhao et al. 2016. The original authors also showed no significant three-way interaction of alignment, congruency and task, which they state suggests that the line patterns are processed as holistically as the human faces. Here, I am running a 2 (task) x 2 (congruency) x 2 (alignment) repeated measures ANOVA to see if I find the same results
+
+```{r}
 overall_anova <- ezANOVA(data = d.results,
                    dv = d_prime,
                    wid = worker_id,
                    within = .(trial_id,congruency,alignment),
                    detailed = T,
                    return_aov = T)
-overall_anova$ANOVA
+kable(overall_anova$ANOVA[1:7], digits = 3, padding=10) %>%
+  kable_styling(full_width = F, position = "center")
+```
 
-## individual 2 (congruency) x 2 (alignment) rm ANOVA for the line task
+#### The line task
+Second, I want to see if there is a significant effect of congruency and a significant interaction of congruency and alignment in the line task alone. The interaction is the **key finding** I am attempting to replicate. To test this, I am running a 2 (congruency) x 2 (alignment) repeated measures ANOVA for the line task.
+
+```{r}
 d.line <- d.results %>%
   filter(trial_id == "line")
 
@@ -202,13 +214,16 @@ line_anova <- ezANOVA(data = d.line,
                    detailed = T,
                    return_aov = T)
 
-line_anova$ANOVA # display results
+kable(line_anova$ANOVA[1:7], digits = 3, padding=10) %>%
+  kable_styling(full_width = F, position = "center")
+```
 
-# post hoc t tests
+Furthermore, the original authors showed that the interaction was driven by a significant effect of congruency in aligned condition, but not the misaligned condition. To investigate this, I am running post hoc t tests. 
+
+```{r}
 num_tests_line = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
 
-# test effect of congruency in aligned condition
-# (Note to self: there has got to be a better way to do this!)
+# Test effect of congruency in aligned condition
 d.line.aligned <- d.line %>%
   filter(alignment == "aligned") %>%
   dplyr::select(worker_id, congruency, d_prime)
@@ -221,9 +236,12 @@ x2 <- d.line.aligned %>%
 
 t.line.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.line.aligned$p.value <- t.line.aligned$p.value*num_tests_line # correct p value for mult comp
-t.line.aligned # display results
+kable(t(c(t.line.aligned$statistic, t.line.aligned$parameter, t.line.aligned$p.value)), 
+      digits=3, caption = "Effect of congruency in the aligned condition",
+      col.names = c("t-statistic", "df", "p value")) %>%
+      kable_styling(full_width = F, position = "center") 
 
-# test effect of congruency in misaligned condition
+# Test effect of congruency in misaligned condition
 d.line.misaligned <- d.line %>%
   filter(alignment == "misaligned") %>%
   dplyr::select(worker_id, congruency, d_prime)
@@ -236,9 +254,16 @@ x2 <- d.line.misaligned %>%
 
 t.line.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.line.misaligned$p.value <- t.line.misaligned$p.value*num_tests_line # correct p value for mult comp
-t.line.misaligned # display results
+kable(t(c(t.line.misaligned$statistic, t.line.misaligned$parameter, t.line.misaligned$p.value)), 
+      digits=3, caption = "Effect of congruency in the misaligned condition",
+      col.names = c("t-statistic", "df", "p value")) %>%
+      kable_styling(full_width = F, position = "center") 
+```
 
-## individual 2 (congruency) x 2 (alignment) rm ANOVA for the face task
+#### The face task
+Next, I am going to repeat these tests for the face task. The original authors also found a significant effect of congruency and a significant interaction of congruency and alignment in the face task. I am running a 2 (congruency) x 2 (alignment) repeated measures ANOVA for the face task.
+
+```{r}
 d.face <- d.results %>%
   filter(trial_id == "face")
 
@@ -249,9 +274,12 @@ face_anova <- ezANOVA(data = d.face,
                    detailed = T,
                    return_aov = T)
 
-face_anova$ANOVA # display results
+kable(face_anova$ANOVA[1:7], digits = 3, padding=10) %>%
+  kable_styling(full_width = F, position = "center")
+```
 
-# post hoc t tests
+As with the line task, the original authors showed that the interaction was driven by a significant effect of congruency in aligned condition, but not the misaligned condition. To investigate this, I am again running post hoc t tests. 
+```{r}
 num_tests_face = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
 
 # test effect of congruency in aligned condition
@@ -267,7 +295,10 @@ x2 <- d.face.aligned %>%
 
 t.face.aligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.face.aligned$p.value <- t.face.aligned$p.value*num_tests_face # correct p value for mult comp
-t.face.aligned # display results
+kable(t(c(t.face.aligned$statistic, t.face.aligned$parameter, t.face.aligned$p.value)), 
+      digits=3, caption = "Effect of congruency in the aligned condition",
+      col.names = c("t-statistic", "df", "p value")) %>%
+      kable_styling(full_width = F, position = "center") 
 
 # test effect of congruency in misaligned condition
 d.face.misaligned <- d.face %>%
@@ -282,15 +313,21 @@ x2 <- d.face.misaligned %>%
 
 t.face.misaligned <- t.test(x1$d_prime, x2$d_prime, paired = T)
 t.face.misaligned$p.value <- t.face.misaligned$p.value*num_tests_face # correct p value for mult comp
-t.face.misaligned # display results
+kable(t(c(t.face.misaligned$statistic, t.face.misaligned$parameter, t.face.misaligned$p.value)), 
+      digits=3, caption = "Effect of congruency in the misaligned condition",
+      col.names = c("t-statistic", "df", "p value")) %>%
+      kable_styling(full_width = F, position = "center")  
+```
 
-## Reproduce original graph
+#### Plotting the results
+Here are the original results, as plotted in the paper. Exact values were not reported and had to be approximated from the original figure. Because of this, error bars are not included. 
+```{r}
 # use data frame structure of d.results
 orig <- d.results[1:8,]
 orig <- orig %>%
   ungroup() %>%
   select(trial_id,alignment,congruency,d_prime)
-# replace d prime values with values from paper - exact values were not reported and had to be approximated from the original figure
+# replace d prime values with values from paper 
 orig$d_prime <- c(2.6,1.9,2.3,2,2.7,1.5,2,1.9)
 # plot face and line data
 orig %>%
@@ -298,32 +335,39 @@ orig %>%
   facet_grid(.~ trial_id) +
   geom_point(aes(col=congruency)) +
   geom_line(aes(group = congruency,col=congruency)) +
+  labs(title = "Original plot") +
   ylim(0,5) + ylab("Sensitivity (d')") + xlab("") +
   scale_color_manual(values=c("red", "blue")) +
   theme_classic() +
-  theme(legend.position = "top") 
+  theme(legend.position = "top") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
-## Plot the replication data in the same format
+Here are the replication results, plotted in the same format. Error bars represent the standard error of the mean
+
+```{r}
+sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(sum(!is.na((x))))} # formula for sem
+
 d.plot <- d.results %>%
   ungroup() %>%
   group_by(trial_id,alignment,congruency) %>%
-  summarize(avg = mean(d_prime))
+  summarize(avg = mean(d_prime), error = sem(d_prime))
 d.plot %>%
   ggplot(aes(x= alignment, y = avg)) +
   facet_grid(.~ trial_id) +
   geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=avg-error, ymax=avg+error), width=.1) +
   geom_line(aes(group = congruency,col=congruency)) +
-  ylim(0,5) + ylab("Sensitivity (d')") + xlab("") +
+  labs(title = "Replication plot") +
+  ylab("Sensitivity (d')") + xlab("") +
   scale_color_manual(values=c("red", "blue")) +
   theme_classic() +
-  theme(legend.position = "top") 
-
+  theme(legend.position = "top") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 ```
 
-![Key plot from original paper.](/Users/dfinzi/Desktop/Zhao2016/pilot_a/original_figure.png)
-*Side-by-side graph with original graph is ideal here*
 
 ###Exploratory analyses
 
