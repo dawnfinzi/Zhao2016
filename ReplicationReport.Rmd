@@ -94,6 +94,7 @@ library(tidyverse)
 library(jsonlite)
 library(knitr)
 library(kableExtra)
+library(Rmisc)
 library(ez)
 library(lsr)
 
@@ -346,17 +347,16 @@ orig %>%
 Here are the replication results, plotted in the same format. Error bars represent the standard error of the mean
 
 ```{r}
-sem <- function(x) {sd(x, na.rm=TRUE) / sqrt(sum(!is.na((x))))} # formula for sem
+# summarize for within subject error bars
+d.plot <- summarySEwithin(d.results, measurevar="d_prime",
+                        withinvars=c("trial_id","alignment","congruency"),
+                        idvar="worker_id", na.rm=FALSE, conf.interval=.95)
 
-d.plot <- d.results %>%
-  ungroup() %>%
-  group_by(trial_id,alignment,congruency) %>%
-  summarize(avg = mean(d_prime), error = sem(d_prime))
 d.plot %>%
-  ggplot(aes(x= alignment, y = avg)) +
+  ggplot(aes(x= alignment, y = d_prime)) +
   facet_grid(.~ trial_id) +
   geom_point(aes(col=congruency)) +
-  geom_errorbar(aes(ymin=avg-error, ymax=avg+error), width=.1) +
+  geom_errorbar(aes(ymin=d_prime-se, ymax=d_prime+se), width=.1) +
   geom_line(aes(group = congruency,col=congruency)) +
   labs(title = "Replication plot") +
   ylab("Sensitivity (d')") + xlab("") +
