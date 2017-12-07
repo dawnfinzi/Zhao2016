@@ -90,13 +90,14 @@ Data preparation following the analysis plan.
 ####Load Relevant Libraries and Functions
 
 rm(list=ls())
+library(Rmisc)
 library(tidyverse)
+library(ggthemes)
 library(jsonlite)
 library(knitr)
 library(kableExtra)
-library(Rmisc)
 library(ez)
-library(lsr)
+#library(lsr)
 
 options(knitr.table.format = "html") 
 ```
@@ -141,6 +142,11 @@ d <- d %>%
   mutate(avg = mean(correct)) %>%
   filter(avg > .55)
 
+#test <- d %>%
+#  group_by(worker_id) %>%
+#  summarise(mean_acc = mean(correct), mean_rt = mean(rt))
+#mean(test$mean_acc)
+
 # Compile sample size and exclusion values and print
 total_n <- length(unique(d.raw$worker_id))
 filtered_n <- length(unique(d$worker_id))
@@ -166,7 +172,8 @@ d %>% ggplot(aes(x=rt)) +
   geom_histogram(binwidth=10, col = "black") +
   labs(title = "Histogram of reaction time (all subjects collapsed)",
        x = "Reaction time", y = "Count") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlim(0,1000)
 ```
 
 In order to run statistic analyses on the data, I am first calculating the hit rates and false alarms by condition and task. Then I will calculate d prime by subtracting the z-transform of the false alarm rate from the z-transform of the hit rate. To avoid impossible numbers, any false alarm rates of 0 will be replaced by 1/(2 x the max number of false alarms) and any hit rates of 1 will be replaced by 1-1/(2 x the max number of hits).
@@ -331,16 +338,17 @@ orig <- orig %>%
 # replace d prime values with values from paper 
 orig$d_prime <- c(2.6,1.9,2.3,2,2.7,1.5,2,1.9)
 # plot face and line data
+task_names <- c("face" = "Face task", "line" = "Line task")
 orig %>%
   ggplot(aes(x= alignment, y = d_prime)) +
-  facet_grid(.~ trial_id) +
+  facet_grid(.~ trial_id, labeller = as_labeller(task_names)) +
   geom_point(aes(col=congruency)) +
   geom_line(aes(group = congruency,col=congruency)) +
   labs(title = "Original plot") +
   ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
   scale_color_manual(values=c("red", "blue")) +
-  theme_classic() +
-  theme(legend.position = "top") +
+  theme_few() +
+  theme(aspect.ratio=1) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
@@ -351,18 +359,19 @@ Here are the replication results, plotted in the same format. Error bars represe
 d.plot <- summarySEwithin(d.results, measurevar="d_prime",
                         withinvars=c("trial_id","alignment","congruency"),
                         idvar="worker_id", na.rm=FALSE, conf.interval=.95)
+task_names <- c("face" = "Face task", "line" = "Line task")
 
 d.plot %>%
   ggplot(aes(x= alignment, y = d_prime)) +
-  facet_grid(.~ trial_id) +
+  facet_grid(.~ trial_id, labeller = as_labeller(task_names)) +
   geom_point(aes(col=congruency)) +
   geom_errorbar(aes(ymin=d_prime-se, ymax=d_prime+se), width=.1) +
   geom_line(aes(group = congruency,col=congruency)) +
   labs(title = "Replication plot") +
-  ylab("Sensitivity (d')") + xlab("") +
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
   scale_color_manual(values=c("red", "blue")) +
-  theme_classic() +
-  theme(legend.position = "top") +
+  theme_few() +
+  theme(aspect.ratio=1) +
   theme(plot.title = element_text(hjust = 0.5))
 
 
