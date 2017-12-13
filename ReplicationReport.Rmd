@@ -15,7 +15,8 @@ output:
 ##Introduction
 
 In their 2016 Psychological Science paper, Zhao, Bülthoff and Bülthoff showed that nonface objects, specifically line patterns with salient Gestalt information, can elicit holistic processing, even in the absence of expertise. In this paper, holistic processing was measured by composite tasks. In a composite task, participants are shown two images (separated by a mask). Participants are then asked whether the top half of the second image is the same as, or different from, the first image they were shown. The effect produced by holistic processing is an increased difficulty in identifying as the same top halves of two sequentially presented stimuli when aligned with different bottom halves, than when misaligned with said bottom halves. This effect has traditionally been shown with faces. 
-Here, the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effectin the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
+
+Here, the dependent variable was response sensitivity (d') and a significant interaction between congruency and alignment in the line composite task (driven by a much larger congruency effect in the aligned conditions than in the misaligned conditions) was taken as evidence of holistic processing for the line pattern stimuli. I aim to replicate Experiment 1a of this paper, where participants are presented with a line composite task and a face composite task in a single session. In that experiment, the authors found evidence for holistic processing of both stimuli types (line and face).
 
 ##Methods
 
@@ -68,23 +69,21 @@ The online experiment can be accessed [here](http://stanford.edu/~dfinzi/Zhao_et
 
 ### Methods Addendum (Post Data Collection)
 
-You can comment this section out prior to final report with data collection.
+Due to a technical issue with the registration process, the official preregistration was not completed, but a github commit of the analysis script prior to data collection ([last pre-data collection commit](https://github.com/psych251/Zhao2016/commit/a8d98d06af59a0080339585367d1d6ede1d8c168)) serves as the preregistration. 
 
 #### Actual Sample
-  Sample size, demographics, data exclusions based on rules spelled out in analysis plan
+  Data from 15 participants were collected through Mechanical Turk. One participant was excluded as their overall accuracy was less than 55%, leaving a sample size of 14. 
 
 #### Differences from pre-data collection methods plan
-  Any differences from what was described as the original plan, or “none”.
-
+  Minor changes were made to the confirmatory analysis to clean up the appearance of tables and figures.
 
 ##Results
-
 
 ### Data preparation
 
 Data preparation following the analysis plan.
 	
-```{r include=F, message=FALSE}
+```{r include=F, message=F}
 ###Data Preparation
 
 ####Load Relevant Libraries and Functions
@@ -97,12 +96,12 @@ library(jsonlite)
 library(knitr)
 library(kableExtra)
 library(ez)
-#library(lsr)
+library(brms)
 
 options(knitr.table.format = "html") 
 ```
 
-```{r, message=FALSE}
+```{r, warning = F}
 ####Import data
 path <- "../Zhao2016/"
 files <- dir(paste0(path,"anonymized-results/"), 
@@ -142,19 +141,14 @@ d <- d %>%
   mutate(avg = mean(correct)) %>%
   filter(avg > .55)
 
-#test <- d %>%
-#  group_by(worker_id) %>%
-#  summarise(mean_acc = mean(correct), mean_rt = mean(rt))
-#mean(test$mean_acc)
-
 # Compile sample size and exclusion values and print
 total_n <- length(unique(d.raw$worker_id))
 filtered_n <- length(unique(d$worker_id))
 num_excluded <- total_n - filtered_n
-basics <- data.frame(c(total_n, num_excluded, filtered_n))
-rownames(basics) <- c("Total participants", "Excluded participants", "Final sample")
-colnames(basics) <- "N"
-kable(basics) %>%
+sample_info <- data.frame(c(total_n, num_excluded, filtered_n))
+rownames(sample_info) <- c("Total participants", "Excluded participants", "Final sample")
+colnames(sample_info) <- "N"
+kable(sample_info) %>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
 # recast variables (imported as lists)
@@ -173,15 +167,17 @@ d %>% ggplot(aes(x=rt)) +
   labs(title = "Histogram of reaction time (all subjects collapsed)",
        x = "Reaction time", y = "Count") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  xlim(0,1000)
+  xlim(0,1500)
 ```
 
 In order to run statistic analyses on the data, I am first calculating the hit rates and false alarms by condition and task. Then I will calculate d prime by subtracting the z-transform of the false alarm rate from the z-transform of the hit rate. To avoid impossible numbers, any false alarm rates of 0 will be replaced by 1/(2 x the max number of false alarms) and any hit rates of 1 will be replaced by 1-1/(2 x the max number of hits).
+
 ```{r}
 #### Prepare data for analysis 
 d.results <- d %>%
   group_by(worker_id,trial_id,alignment,congruency) %>%
-  summarize(avg = mean(correct),
+  summarize(rt = mean(rt),
+            avg = mean(correct),
             false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
             hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
             max_fa = sum(response=="same"),
@@ -197,21 +193,22 @@ d.results <- d %>%
 #### Both tasks combined
 First, I want to see if there is an overall effect of congruency, and an interaction between congruency and alignment as in the Zhao et al. 2016. The original authors also showed no significant three-way interaction of alignment, congruency and task, which they state suggests that the line patterns are processed as holistically as the human faces. Here, I am running a 2 (task) x 2 (congruency) x 2 (alignment) repeated measures ANOVA to see if I find the same results
 
-```{r}
+```{r, message = F, warning = F}
 overall_anova <- ezANOVA(data = d.results,
                    dv = d_prime,
                    wid = worker_id,
                    within = .(trial_id,congruency,alignment),
                    detailed = T,
                    return_aov = T)
-kable(overall_anova$ANOVA[1:7], digits = 3, padding=10) %>%
-  kable_styling(full_width = F, position = "center")
+kable(overall_anova$ANOVA[1:7], digits = 3, padding=10, caption = "Overall ANOVA") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T) 
 ```
 
 #### The line task
 Second, I want to see if there is a significant effect of congruency and a significant interaction of congruency and alignment in the line task alone. The interaction is the **key finding** I am attempting to replicate. To test this, I am running a 2 (congruency) x 2 (alignment) repeated measures ANOVA for the line task.
 
-```{r}
+```{r, message = F, warning = F}
 d.line <- d.results %>%
   filter(trial_id == "line")
 
@@ -222,13 +219,14 @@ line_anova <- ezANOVA(data = d.line,
                    detailed = T,
                    return_aov = T)
 
-kable(line_anova$ANOVA[1:7], digits = 3, padding=10) %>%
-  kable_styling(full_width = F, position = "center")
+kable(line_anova$ANOVA[1:7], digits = 3, padding=10, caption = "Line task ANOVA") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T) 
 ```
 
 Furthermore, the original authors showed that the interaction was driven by a significant effect of congruency in aligned condition, but not the misaligned condition. To investigate this, I am running post hoc t tests. 
 
-```{r}
+```{r, message = F, warning = F}
 num_tests_line = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
 
 # Test effect of congruency in aligned condition
@@ -271,7 +269,7 @@ kable(t(c(t.line.misaligned$statistic, t.line.misaligned$parameter, t.line.misal
 #### The face task
 Next, I am going to repeat these tests for the face task. The original authors also found a significant effect of congruency and a significant interaction of congruency and alignment in the face task. I am running a 2 (congruency) x 2 (alignment) repeated measures ANOVA for the face task.
 
-```{r}
+```{r, message = F, warning = F}
 d.face <- d.results %>%
   filter(trial_id == "face")
 
@@ -282,12 +280,14 @@ face_anova <- ezANOVA(data = d.face,
                    detailed = T,
                    return_aov = T)
 
-kable(face_anova$ANOVA[1:7], digits = 3, padding=10) %>%
-  kable_styling(full_width = F, position = "center")
+kable(face_anova$ANOVA[1:7], digits = 3, padding=10, caption = "Face task ANOVA") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T) 
 ```
 
 As with the line task, the original authors showed that the interaction was driven by a significant effect of congruency in aligned condition, but not the misaligned condition. To investigate this, I am again running post hoc t tests. 
-```{r}
+
+```{r, message = F, warning = F}
 num_tests_face = 2 #2 post hoc t tests (1 for aligned and 1 for misaligned)
 
 # test effect of congruency in aligned condition
@@ -329,7 +329,8 @@ kable(t(c(t.face.misaligned$statistic, t.face.misaligned$parameter, t.face.misal
 
 #### Plotting the results
 Here are the original results, as plotted in the paper. Exact values were not reported and had to be approximated from the original figure. Because of this, error bars are not included. 
-```{r}
+
+```{r, message = F, warning = F}
 # use data frame structure of d.results
 orig <- d.results[1:8,]
 orig <- orig %>%
@@ -352,9 +353,9 @@ orig %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Here are the replication results, plotted in the same format. Error bars represent the standard error of the mean
+Here are the replication results, plotted in the same format. Error bars represent the standard error of the mean, within subjects.
 
-```{r}
+```{r, message = F, warning = F}
 # summarize for within subject error bars
 d.plot <- summarySEwithin(d.results, measurevar="d_prime",
                         withinvars=c("trial_id","alignment","congruency"),
@@ -374,14 +375,370 @@ d.plot %>%
   theme(aspect.ratio=1) +
   theme(plot.title = element_text(hjust = 0.5))
 
+```
+
+Interestingly, this replication attempt revealed a significant composite effect in the line task (as measure by a significant interaction between congruency and alignment in that task) but no composite effect in the face task. The following exploratory analyses will be mainly focused on determining why this might be the case. 
+
+###Exploratory analyses
+
+#### Summary statistics and effect sizes
+I am first summarizing accuracy and reaction time (RT) for the two tasks. Mean accuracy is calculated as the group mean of each individual's mean accuracy across all conditions by task. Mean RT is instead calculated as the group mean of each individual's *median* accuracy across all conditions by task, due to the heavy skew inherent in RT data. 
+
+As the face task was always presented second in my implementation, one possible explanation for the lack of a composite effect in this task may be participant fatigue. However, these simple summary statistics suggest that this is probably not the case, as participants were more accurate in the face task (83%) than in the line task (74%). This possibility will be investigated further in later analyses.
+```{r, message = F, warning = F}
+# Compile basic stats about worker performance after exclusion
+d_basics <- d %>%
+  group_by(worker_id, trial_id) %>%
+  summarise(mean_acc = mean(correct), median_rt = median(rt, na.rm = T))
+basics <- d_basics %>%
+  group_by(trial_id) %>%
+  summarise(accuracy = mean(mean_acc), RT = mean(median_rt),
+            acc_sd = sd(mean_acc), RT_sd = sd(median_rt))
+
+basics <- basics[,2:5]
+rownames(basics) <- c("Face task", "Line task")  
+kable(basics, digits = 2, col.names = c("Accuracy", "RT", "Accuracy", "RT")) %>%
+  kable_styling(bootstrap_options = c("hover"), full_width = F) %>%
+  add_header_above(c(" " = 1, "Means" = 2, "Standard deviation" = 2)) %>%
+  column_spec(1, bold = T, border_right = T) 
+```
+
+Effect sizes were not included in the pre-registered confirmatory analysis but are important to calculate. Here, I am calculating the partial eta squared for each effect in the overall ANOVA, the line task ANOVA and the face task ANOVA.
+
+```{r, message = F, warning = F}
+# Effect sizes
+
+# Overall anova
+unlisted <- unlist(overall_anova$ANOVA)
+overall_aov_stats <- tibble(
+  effect = c("trial_id", "congruency", "alignment", 
+             "trial_id:congruency", "trial_id:alignment", "congruency:alignment",
+             "trial_id:congruency:alignment"),
+  F = c(as.double(unlisted["F2"]), as.double(unlisted["F3"]), as.double(unlisted["F4"]),
+        as.double(unlisted["F5"]), as.double(unlisted["F6"]), as.double(unlisted["F7"]),
+        as.double(unlisted["F8"])), 
+  p = c(as.double(unlisted["p2"]), as.double(unlisted["p3"]), as.double(unlisted["p4"]),
+        as.double(unlisted["p5"]), as.double(unlisted["p6"]), as.double(unlisted["p7"]),
+        as.double(unlisted["p8"])),
+  SSn = c(as.double(unlisted["SSn2"]), as.double(unlisted["SSn3"]), 
+          as.double(unlisted["SSn4"]), as.double(unlisted["SSn5"]), 
+          as.double(unlisted["SSn6"]), as.double(unlisted["SSn7"]),
+          as.double(unlisted["SSn8"])),
+  SSd = c(as.double(unlisted["SSd2"]), as.double(unlisted["SSd3"]), 
+          as.double(unlisted["SSd4"]), as.double(unlisted["SSd5"]), 
+          as.double(unlisted["SSd6"]), as.double(unlisted["SSd7"]),
+          as.double(unlisted["SSd8"]))) %>% 
+  mutate(partial_eta_squared = SSn / (SSn + SSd)) %>% 
+  select(-SSn, -SSd)
+
+kable(overall_aov_stats, digits = 2, col.names = c("Effect", "F", "p", "Partial eta squared"),
+      caption = "Overall ANOVA effect sizes") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T) 
+```
+
+Here we see that the largest effect is the main effect of congruency (ηp2 = 0.63), although the congruency by alignment interaction, and the congruency by alignment by task interaction are also very large effects (ηp2 = 0.54 for both).
+
+```{r, message = F, warning = F}
+# Line anova
+unlisted <- unlist(line_anova$ANOVA)
+line_aov_stats <- tibble(
+  effect = c("congruency", "alignment", "congruency:alignment"),
+  F = c(as.double(unlisted["F2"]), as.double(unlisted["F3"]), 
+        as.double(unlisted["F4"])), 
+  p = c(as.double(unlisted["p2"]), as.double(unlisted["p3"]), 
+        as.double(unlisted["p4"])),
+  SSn = c(as.double(unlisted["SSn2"]), as.double(unlisted["SSn3"]),
+          as.double(unlisted["SSn4"])),
+  SSd = c(as.double(unlisted["SSd2"]), as.double(unlisted["SSd3"]),
+          as.double(unlisted["SSd4"]))) %>% 
+  mutate(partial_eta_squared = SSn / (SSn + SSd)) %>% 
+  select(-SSn, -SSd)
+
+kable(line_aov_stats, digits = 2, col.names = c("Effect", "F", "p", "Partial eta squared"),
+      caption = "Line task ANOVA effect sizes") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T) 
+```
+
+In the line task there is again a large main effect of congruency (ηp2 = 0.42). The congruency by alignment interaction (our key replication statistic) is even larger at ηp2 = 0.70. Note that this is also greater than original effect size of .52.
+
+```{r, message = F, warning = F}
+# face anova
+unlisted <- unlist(face_anova$ANOVA)
+face_aov_stats <- tibble(
+  effect = c("congruency", "alignment", "congruency:alignment"),
+  F = c(as.double(unlisted["F2"]), as.double(unlisted["F3"]), 
+        as.double(unlisted["F4"])), 
+  p = c(as.double(unlisted["p2"]), as.double(unlisted["p3"]), 
+        as.double(unlisted["p4"])),
+  SSn = c(as.double(unlisted["SSn2"]), as.double(unlisted["SSn3"]),
+          as.double(unlisted["SSn4"])),
+  SSd = c(as.double(unlisted["SSd2"]), as.double(unlisted["SSd3"]),
+          as.double(unlisted["SSd4"]))) %>% 
+  mutate(partial_eta_squared = SSn / (SSn + SSd)) %>% 
+  select(-SSn, -SSd)
+
+kable(face_aov_stats, digits = 2, col.names = c("Effect", "F", "p", "Partial eta squared"),
+      caption = "Face task ANOVA effect sizes") %>%
+  kable_styling(full_width = F, position = "center", bootstrap_options = c("hover")) %>%
+  column_spec(1, bold = T, border_right = T)  
 
 ```
 
+Effect sizes for the face task ANOVA confirm that the effect of congruency is large (ηp2 = 0.52).
 
-###Exploratory analyses
+#### Bayesian analysis of task similarity
+Here, I am running a Bayesian analysis of task similarity. In the original paper, the authors made a point of the null three-way interaction between congruency, alignment and task as showing that there was not a significant difference in the composite effect by task. However, in order to provide evidence of this, a more appropriate analysis would be to first model the data using congruency and alignment (Model 1), then model the data a second time incorporating task as an effect (Model 2), and then compare the performance of these two models. The model odds can be compared using bridgesampling (which computes the log marginal likelihood of the fit) and calculating a bayes factor (BF). Here, BF was calculated as Model 2 vs Model 1 using the function 'bf' from the bridgesampling package. In this case, a BF greater than 1 would be evidence that the second model performed better (indicating the predictive power of task, i.e. task dissimilarity) whereas a BF less than 1 would be evidence for H0 (which could either be no difference between the models, or in favor of Model 1 over Model 2), indicating that incorporating task into the model did not improve performance (i.e. task similarity).
+
+```{r, results = 'hide', message = F, warning = F}
+# Bayesian task similarity analysis
+# Model 1: congruency and alignment
+fit1 <- brm(d_prime ~ congruency + alignment + congruency:alignment, d.results,
+            save_all_pars = T)
+summary(fit1)
+bridge_1 <- brms::bridge_sampler(fit1)
+
+# Model 2: congruency, alignment and task
+# To test whether adding task (trial_id) to the model improves fit
+fit2 <- brm(d_prime ~ trial_id + congruency + alignment + trial_id:congruency
+            + trial_id:alignment + congruency:alignment + trial_id:congruency:alignment, 
+            d.results, save_all_pars = T)
+summary(fit2)
+bridge_2 <-  brms::bridge_sampler(fit2)
+```
+
+```{r}
+# calculate BF in favor of Model 2 (set as x1) over Model 1 (set as x2)
+bridgesampling::bf(bridge_2,bridge_1)
+```
+
+This is very strong evidence for Model 2, indicating task dissimilarity. This is somewhat obvious given my pattern of results but it would be useful if the composite effect for each task looked more similar and the three-way (task x congruency x alignment) interaction had been non-significant.
+
+#### What is going on with the face task?
+Below, I am looking further into whether a fatigue effect with the face task could be contributing to the lack of a composite effect in that task. To do this, I am dividing the results into the first and second halves of the task. 
+
+```{r, message = F, warning = F}
+# Plot the results of the first half of the face task vs the second
+d.full.face <- d %>%
+  filter(trial_id == "face")
+# calculate the trial index at halfway
+half <- min(d.full.face$trial_index) + 
+  (max(d.full.face$trial_index) - min(d.full.face$trial_index))/2 
+# use this to divide the results into halves
+d.full.face <- d.full.face %>%
+  mutate(trial_index = ifelse(trial_index <= half, 0, 1))
+
+d.ff.results <- d.full.face %>%
+  group_by(worker_id,trial_index,alignment,congruency) %>%
+  summarize(rt = mean(rt),
+            avg = mean(correct),
+            false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
+            hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
+            max_fa = sum(response=="same"),
+            max_hr = sum(response=="different")) %>%
+  ungroup() %>%
+  mutate(false_alarm = ifelse(false_alarm == 0, 1/(2*max_fa), false_alarm)) %>%
+  mutate(hit_rate = ifelse(hit_rate == 1, 1-1/(2*max_hr), hit_rate)) %>%
+  group_by(worker_id,trial_index, alignment,congruency) %>%
+  mutate(d_prime = qnorm(hit_rate)-qnorm(false_alarm))
+
+d.ff.plot <- summarySEwithin(d.ff.results, measurevar="d_prime",
+                        withinvars=c("trial_index","alignment","congruency"),
+                        idvar="worker_id", na.rm=FALSE, conf.interval=.95)
+names <- c("0" = "First half", "1" = "Second half")
+
+d.ff.plot %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_grid(.~ trial_index, labeller = as_labeller(names)) +
+  geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=d_prime-se, ymax=d_prime+se), width=.1) +
+  geom_line(aes(group = congruency,col=congruency)) +
+  labs(title = "Face task by half") +
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_few() +
+  theme(aspect.ratio=1) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+As far as I can tell, splitting the task into two halves does not improve matters and performance looks roughly comparable. It is unlikely that fatigue effects are the root of the lack of a composite effect in this task. 
+
+One thing I noticed when looking at the overall RT histogram in the confirmatory analyses, and at group mean RTs by task in the exploratory analyses, was that RTs were very low. I think an RT of less than 150 ms is somewhat implausible, so I will rerun the analysis trimming RTs less than this, under the assumption that these RTs represent trials where participants are just pressing buttons randomly or accidentally.
+
+```{r, message = F, warning = F}
+# Look more closely at RT by task
+d %>% 
+  ggplot(aes(x=rt,fill=trial_id)) +
+  geom_histogram(binwidth=30, position="jitter", alpha = 0.8) +
+  labs(title = "Histogram of reaction time (divided by task)",
+       x = "Reaction time", y = "Count") +
+  xlim(0,2000) +
+  scale_fill_manual(values = c("#9999CC", "#66CC99")) +
+  theme_few() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Trim implausible RTs (ie anything less than 150ms)
+d.trimmed <- d %>%
+  filter(rt > 150)
+d.trimmed.results <- d.trimmed %>%
+  group_by(worker_id,trial_id,alignment,congruency) %>%
+  summarize(rt = mean(rt),
+            avg = mean(correct),
+            false_alarm = sum(response=="same"&answer=="different")/sum(response=="same"),
+            hit_rate = sum(response=="different"&answer=="different")/sum(response=="different"),
+            max_fa = sum(response=="same"),
+            max_hr = sum(response=="different")) %>%
+  ungroup() %>%
+  mutate(false_alarm = ifelse(false_alarm == 0, 1/(2*max_fa), false_alarm)) %>%
+  mutate(hit_rate = ifelse(hit_rate == 1, 1-1/(2*max_hr), hit_rate)) %>%
+  mutate(hit_rate = ifelse(hit_rate == 0, 1/(2*max_hr), hit_rate)) %>% #account for anon0
+  group_by(worker_id,trial_id, alignment,congruency) %>%
+  mutate(d_prime = qnorm(hit_rate)-qnorm(false_alarm))
+
+# Replot after trimming
+d.plot <- summarySEwithin(d.trimmed.results, measurevar="d_prime",
+                        withinvars=c("trial_id","alignment","congruency"),
+                        idvar="worker_id", na.rm=FALSE, conf.interval=.95)
+
+d.plot %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_grid(.~ trial_id, labeller = as_labeller(task_names)) +
+  geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=d_prime-se, ymax=d_prime+se), width=.1) +
+  geom_line(aes(group = congruency,col=congruency)) +
+  labs(title = "Trimmed results") +
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_few() +
+  theme(aspect.ratio=1) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Again, this does not appear to be the issue. After trimming, the composite effect in the line task remains, while there is still not effect in the face task (if anything, the relationship is now going in the opposite direction).
+
+To probe this further, I will now look at individual subject results.
+
+```{r, message = F, warning = F}
+# Plot individual face task results
+d.plot.face <- d.results %>%
+  filter(trial_id == "face")
+d.plot.face %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_wrap(~ worker_id, ncol = 5) +
+  geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=d_prime, ymax=d_prime), width=.1) +
+  geom_line(aes(group = congruency,col=congruency)) +
+  scale_color_manual(values=c("red", "blue")) +
+  labs(title = "Individual results for the face task") +
+  ylab("Sensitivity (d')") + xlab("Alignment") +
+  theme_few() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Plot individual line task results
+d.plot.line <- d.results %>%
+  filter(trial_id == "line")
+d.plot.line %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_wrap(~ worker_id, ncol = 5) +
+  geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=d_prime, ymax=d_prime), width=.1) +
+  geom_line(aes(group = congruency,col=congruency)) +
+  scale_color_manual(values=c("red", "blue")) +
+  labs(title = "Individual results for the line task") +
+  ylab("Sensitivity (d')") + xlab("Alignment") +
+  theme_few() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# remove anon0 because of weird performance on line task and replot
+d.filt <- d.results %>%
+  filter(worker_id != "anon0")
+d.filt <- summarySEwithin(d.filt, measurevar="d_prime",
+                        withinvars=c("trial_id","alignment","congruency"),
+                        idvar="worker_id", na.rm=FALSE, conf.interval=.95)
+task_names <- c("face" = "Face task", "line" = "Line task")
+d.filt %>%
+  ggplot(aes(x= alignment, y = d_prime)) +
+  facet_grid(.~ trial_id, labeller = as_labeller(task_names)) +
+  geom_point(aes(col=congruency)) +
+  geom_errorbar(aes(ymin=d_prime-se, ymax=d_prime+se), width=.1) +
+  geom_line(aes(group = congruency,col=congruency)) +
+  labs(title = "Replication plot") +
+  ylim(0,3) + ylab("Sensitivity (d')") + xlab("") +
+  scale_color_manual(values=c("red", "blue")) +
+  theme_few() +
+  theme(aspect.ratio=1) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+It doesn't appear that an outlier participant is driving the unusual face task results. However, one participant did show very poor performance in incongruent condition in the line task (d' less than -2!). I removed this participant and replotted the overall results. There still appears to be a large composite effect in the line task and none in the face task.
+
+#### Partial composite effect
+Finally, let's reanalyze the data in the classic or 'partial' composite design manner. In this version of the composite task, the face composite effect (FCE) in accuracy is calculated by subtracting the mean accuracy on aligned/same/incongruent trials from that on misaligned/same/incongruent trials, with a significant positive value considered to be a composite effect.
+Note that neither the line nor the face task was designed for the partial composite effect (and included numerous extra trials) so this is not definitive.
+
+For further discussion of the differences, strengths and weaknesses of the two designs see Rossion, 2013 (c.f. Richler & Gauthier, 2013).
+
+```{r, message = F, warning = F}
+d.partial.results <- d %>%
+  group_by(worker_id,trial_id,alignment,congruency,response) %>%
+  summarize(accuracy = mean(correct)) %>%
+  filter(response == "same" & congruency == "incongruent") 
+
+d.partial.fce <- d %>%
+  group_by(worker_id,trial_id,alignment,congruency,response) %>%
+  summarize(accuracy = mean(correct)) %>%
+  filter(response == "same" & congruency == "incongruent") %>%
+  spread(alignment, accuracy) %>% 
+  mutate(fce = misaligned-aligned) %>%
+  group_by(trial_id) %>%
+  summarise(effect = mean(fce))
+
+d.partial.fce <- d.partial.fce[,2]
+rownames(d.partial.fce) <- c("Face task", "Line task")  
+kable(d.partial.fce, digits = 2, col.names = c("Face composite effect")) %>%
+  kable_styling(bootstrap_options = c("hover"), full_width = F) %>%
+  column_spec(1, bold = T, border_right = T) 
+
+d.partial.plot <- summarySEwithin(d.partial.results, measurevar="accuracy",
+                        withinvars=c("trial_id","alignment"),
+                        idvar="worker_id", na.rm=FALSE, conf.interval=.95)
+d.partial.plot %>%
+  ggplot(aes(x= trial_id, y = accuracy, fill=alignment)) +
+  geom_bar(stat="identity", position="dodge") +
+  geom_errorbar(aes(ymin=accuracy-se, ymax=accuracy+se), 
+                width=.2,                    
+                position=position_dodge(.9)) +
+  scale_fill_manual(values=c("cyan", "blue")) +
+  labs(title = "Partial design results") +
+  ylab("Accuracy") + xlab("Task") +
+  theme_few() +
+  theme(aspect.ratio=1) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ylim(0,1)
+```
+
+There is no composite effect shown for either task when analyzed as for the partial design.
 
 ## Discussion
 
 ### Summary of Replication Attempt
+The primary finding that I was attempting to replicate was an interaction between congruency and alignment in the line pattern task. In the original study, the authors found a significant congruency by alignment interaction (F(1, 21) = 22.80,*p*< .001, ηp2 = .52), driven by a significant congruency effect found in the aligned condition (t(21) = 5.95,*p*< .001), but not the misaligned condition (t(21) = 0.96,*p*= .348). In my replication, I also observed a significant congruency by alignment interaction in the line pattern task (F(1,13) = 29.83, *p* < .001, ηp2 = .70). As in the original study, this was driven by a significant effect of congruency in the aligned condition (t(13) = 4.48, *p* = .001) but not the misaligned condition (t(13) = 1.44, *p* = 0.348). However, while the key statistic I identified successfully replicated, there was no corresponding composite effect for the face task. In the face task, there was a significant effect of congruency (F(1,13) = 14.04, *p* = .002), but no congruency by alignment interaction. This seriously complicates interpretation of this replication attempt. A key point of the original paper was that line patterns could be processed holistically, like faces are known to be processed. The failure here to reproduce a well-known effect for face stimuli throws the replication into doubt more generally. As such, I would consider this a partially successful replication. 
 
 ### Commentary
+There are a number of reasons why I may have failed to see a composite effect in the face task. For one, the composite effect for the face task in the original paper was smaller than that for the line task. I powered my replication attempt based on the line task result, and thus may have been underpowered to detect the effect in the face task. Additionally, I used different stimuli than the original authors in the face task, but not the line task. The face stimuli I used came from the  [Rossion lab](face-categorization-lab.webnode.com/resources/) (Rossion, 2013) and are actually designed for a slightly different version of the composite task, sometimes referred to as the 'partial design'. I had to adapt these stimuli to create the extra conditions included in the 'full design' used in Zhao et al., 2016. There were also fewer face stimuli available in this stimuli set, allowing for only 80 distinct trials. In order to match the unique 160 trials in the line task, I repeated each trial once. This may have contributed to a reduction in the composite effect.
+
+Furthermore, instead of counterbalancing the two tasks, I presented each participant first with the line pattern task and then with the face task. This design was chosen so as to avoid influencing participants to use holistic processing by presenting the face task first. However, it may induced fatigue effects for the face task. I believe this is unlikely because accuracy was higher for the face task (83%) than the line task (74%) but I ran a number of exploratory analyses in order to check. I looked at the first and second halves of the face task separately and did not see evidence for a composite effect in either half of the task. I also trimmed RTs less than 150 ms, thinking that trials with such low RTs may reflect random or mistaked button pressing. However, this actually led to a greater difference by congruency in the misaligned condition than the aligned condition. Finally, looking at individual participant results did not suggest any outlier participants that could have been driving the unusual face task results. These subsequent data explorations lead me to conclude that fatigue effects are probably not behind the lack of a composite effect in the face task.
+
+I also analyzed the results according to the analysis for the partial composite design. In this analysis only incongruent, same trials are considered and the comparison is accuracy (rather than response sensitivity) between the aligned and misaligned conditions. Greater accuracy for the misaligned than the aligned condition is taken as evidence for the composite effect. Using this method, I did not observe a composite effect for either the face task or the line pattern task. It would be interesting to know what such an analysis would yield in the original Zhao et al., 2016 dataset given the current divide in the literature about which design is preferrable. I should note though that the original study, and thus also this replication, were designed based on the full design and consequently analyses based on the partial design should be interpreted with caution.
+
+Finally, I would also like to note that the original authors kindly provided feedback on our paradigm post data collection (but pre-analysis). They noticed two key differences. First, the images in our online implementation ended up being larger than presented in the original study. Second, in the original study, the critical top parts in the target stimuli were shifted in location by a set amount of pixels relative to the central fixation point in order to avoid the potential confounding factor of spatial attention. This was not included in my implementation. While I'm not sure why these factors would differentially affect the the line and face tasks, it is possible that they influenced these findings. 
+
+## References
+Richler, J. J., & Gauthier, I. (2013). When intuition fails to align with data: A reply to Rossion (2013). *Visual cognition*, 21(2), 254-276.
+
+Rossion, B. (2013). The composite face illusion: A whole window into our understanding of holistic face perception. *Visual Cognition*, 21(2), 139-253.
+
+Susilo, T., Rezlescu, C., & Duchaine, B. (2013). The composite effect for inverted faces is reliable at large sample sizes and requires the basic face configuration. *Journal of Vision*, 13(13), 14-14.
+
+Zhao, M., Bülthoff, H. H., & Bülthoff, I. (2016). Beyond faces and expertise: Facelike holistic processing of nonface objects in the absence of expertise. *Psychological science*, 27(2), 213-222.
